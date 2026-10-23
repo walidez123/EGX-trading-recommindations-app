@@ -1,0 +1,13 @@
+fastapi>=0.115.0
+uvicorn>=0.30.0
+pandas>=2.2.0
+numpy>=1.26.0
+scipy>=1.13.0
+yfinance>=0.2.50
+mplfinance>=0.12.10b0
+matplotlib>=3.9.0
+pydantic>=2.9.0
+python-multipart>=0.0.12
+pypdf>=5.0.0
+google-antigravity>=0.1.22
+google-genai>=1.0.0

@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EGX AlphaCore — 3Y Index Analyzer, Dynamic Swing Advisor &amp; Recommendation Evaluator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --tv-bg: #131722;
+      --tv-panel: #1e222d;
+      --tv-panel-hover: #262b38;
+      --tv-border: #2a2e39;
+      --tv-text: #d1d4dc;
+      --tv-muted: #787b86;
+      --tv-blue: #2962ff;
+      --tv-blue-hover: #1e53e5;
+      --tv-green: #089981;
+      --tv-red: #f23645;
+      --tv-amber: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--tv-bg);
+      color: var(--tv-text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tv-panel {
+      background-color: var(--tv-panel);
+      border: 1px solid var(--tv-border);
+      border-radius: 6px;
+    }
+
+    .tv-input {
+      background-color: var(--tv-bg);
+      border: 1px solid var(--tv-border);
+      color: var(--tv-text);
+      border-radius: 4px;
+      padding: 8px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .tv-input:focus {
+      border-color: var(--tv-blue);
+    }
+
+    .tv-btn-primary {
+      background-color: var(--tv-blue);
+      color: #ffffff;
+      border-radius: 4px;
+      font-weight: 600;
+      transition: background-color 0.15s ease;
+    }
+
+    .tv-btn-primary:hover {
+      background-color: var(--tv-blue-hover);
+    }
+
+    .tv-btn-green {
+      background-color: var(--tv-green);
+      color: #ffffff;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .tv-btn-green:hover {
+      opacity: 0.92;
+    }
+
+    .tv-btn-red {
+      background-color: var(--tv-red);
+      color: #ffffff;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .tv-btn-red:hover {
+      opacity: 0.92;
+    }
+
+    .tv-btn-secondary {
+      background-color: #2a2e39;
+      color: var(--tv-text);
+      border: 1px solid #363a45;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .tv-btn-secondary:hover {
+      background-color: #363a45;
+    }
+
+    .tv-tab {
+      color: var(--tv-muted);
+      border-bottom: 2px solid transparent;
+      padding: 10px 15px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tv-tab:hover {
+      color: var(--tv-text);
+    }
+
+    .tv-tab-active {
+      color: #ffffff;
+      border-bottom: 2px solid var(--tv-blue);
+      background-color: #1e222d;
+    }
+
+    .tf-pill {
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      border: 1px solid #2a2e39;
+      background-color: #131722;
+      color: #787b86;
+      cursor: pointer;
+    }
+
+    .tf-pill-active {
+      background-color: #2962ff;
+      border-color: #2962ff;
+      color: #ffffff;
+    }
+
+    .preset-chip {
+      background-color: #131722;
+      border: 1px solid #2a2e39;
+      color: #d1d4dc;
+      border-radius: 4px;
+      padding: 7px 11px;
+      font-size: 12px;
+      text-align: left;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .preset-chip:hover {
+      border-color: #2962ff;
+      background-color: #262b38;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #131722;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #2a2e39;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR (TradingView Dark Style) -->
+  <header class="bg-[#1e222d] border-b border-[#2a2e39] sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded bg-[#2962ff] flex items-center justify-center font-bold text-white text-sm">
+          EGX
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold text-white tracking-tight">EGX AlphaCore Advisor</h1>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-[#2a2e39] text-[#d1d4dc] font-medium">
+              3Y Index Analysis • Dynamic Target &amp; Timeframe • Live Evaluator
+            </span>
+          </div>
+          <p class="text-xs text-[#787b86]">EGX 30 / 70 / 33 Shariah + Dynamic Stock Target, Timeframe &amp; Stop-Loss</p>
+        </div>
+      </div>
+
+      <!-- Quick Ticker Search + Candle Timeframe Selector + Action Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="flex items-center">
+          <input
+            id="quickTickerInput"
+            type="text"
+            value="COMI.CA"
+            placeholder="Stock or EGX30/70/33"
+            class="tv-input w-36 font-mono-num uppercase text-xs rounded-r-none"
+          />
+          <select
+            id="headerTimeframeSelect"
+            onchange="syncGlobalTimeframe(this.value)"
+            class="tv-input text-xs font-mono-num rounded-none border-l-0 px-2"
+            title="Choose Candle Timeframe: Daily (1D), Weekly (1W), or Monthly (1M)"
+          >
+            <option value="1D">1D Daily</option>
+            <option value="1W">1W Weekly</option>
+            <option value="1M">1M Monthly</option>
+          </select>
+          <button
+            onclick="quickAnalyzeFromHeader()"
+            id="headerAnalyzeBtn"
+            class="tv-btn-primary px-3 py-2 text-xs rounded-l-none whitespace-nowrap"
+          >
+            Analyze
+          </button>
+        </div>
+
+        <button
+          onclick="openDirectTradeModal()"
+          class="tv-btn-green px-3 py-2 text-xs flex items-center gap-1.5"
+        >
+          <span>+ Log Trade</span>
+        </button>
+
+        <button
+          onclick="openManualRecModal()"
+          class="tv-btn-secondary px-3 py-2 text-xs"
+          title="Save a recommendation by date, stock, and source"
+        >
+          + Save Rec
+        </button>
+
+        <button
+          onclick="evaluateAllRecommendationsUI()"
+          id="btnEvaluateRecs"
+          class="tv-btn-secondary px-3 py-2 text-xs"
+          title="Evaluate all saved recommendations against live prices and elapsed time"
+        >
+          ↻ Evaluate Recs
+        </button>
+
+        <button
+          onclick="openSettingsModal()"
+          class="tv-btn-secondary px-3 py-2 text-xs flex items-center gap-1.5"
+          title="Configure Cash, Risk Rules, AI Mode & Gemini API Key"
+        >
+          <span>⚙ Settings</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TABS BAR -->
+    <div class="max-w-7xl mx-auto px-4 flex items-center gap-1 overflow-x-auto border-t border-[#2a2e39]">
+      <button onclick="switchTab('portfolio')" id="tab-portfolio" class="tv-tab tv-tab-active">
+        1. Portfolio &amp; Open Trades
+      </button>
+      <button onclick="switchTab('indices')" id="tab-indices" class="tv-tab">
+        2. EGX Indices (3Y: EGX30 / EGX70 / EGX33)
+      </button>
+      <button onclick="switchTab('terminal')" id="tab-terminal" class="tv-tab">
+        3. AI Stock &amp; Index Advisor
+      </button>
+      <button onclick="switchTab('chart')" id="tab-chart" class="tv-tab">
+        4. Interactive Chart (1D / 1W / 1M)
+      </button>
+      <button onclick="switchTab('memory')" id="tab-memory" class="tv-tab">
+        5. Recommendations Tracker &amp; Evaluation
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl w-full mx-auto px-4 py-5 flex-1 space-y-5">
+
+    <!-- TOP SUMMARY STRIP (4 Simple Numbers) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <!-- Total Value -->
+      <div class="tv-panel p-4">
+        <div class="text-xs text-[#787b86] font-medium">Total Account Value (Cash + Stocks)</div>
+        <div id="metricTotalEquity" class="text-xl font-bold font-mono-num text-white mt-1">1,000,000 EGP</div>
+        <div id="metricUnrealizedPct" class="text-xs text-[#787b86] mt-1">Open Profit/Loss: 0.00 EGP (0.00%)</div>
+      </div>
+
+      <!-- Available Cash -->
+      <div class="tv-panel p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-[#787b86] font-medium">Available Cash</span>
+          <button onclick="promptUpdateCash()" class="text-[11px] text-[#2962ff] hover:underline font-medium">
+            Edit Cash
+          </button>
+        </div>
+        <div id="metricCashBalance" class="text-xl font-bold font-mono-num text-white mt-1">1,000,000 EGP</div>
+        <div class="text-xs text-[#787b86] mt-1">Ready for new trades</div>
+      </div>
+
+      <!-- Money in Stocks -->
+      <div class="tv-panel p-4">
+        <div class="text-xs text-[#787b86] font-medium">Money Invested in Stocks</div>
+        <div id="metricInvestedValue" class="text-xl font-bold font-mono-num text-white mt-1">0 EGP</div>
+        <div id="metricOpenPositionsCount" class="text-xs text-[#787b86] mt-1">0 Open Trades (Max 20% per stock)</div>
+      </div>
+
+      <!-- Recommendation Accuracy Summary -->
+      <div class="tv-panel p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-[#787b86] font-medium">Saved Recommendations Accuracy</span>
+          <button onclick="switchTab('memory')" class="text-[11px] text-[#2962ff] hover:underline font-medium">
+            View Log
+          </button>
+        </div>
+        <div id="metricRecAccuracy" class="text-xl font-bold font-mono-num text-[#089981] mt-1">—</div>
+        <div id="metricRecSummarySub" class="text-xs text-[#787b86] mt-1">Tracked by date, stock &amp; source</div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 1: MY PORTFOLIO & OPEN TRADES                                   -->
+    <!-- =================================================================== -->
+    <section id="view-portfolio" class="space-y-4">
+      <div class="tv-panel p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <h2 class="text-base font-bold text-white">My Active Stock Trades</h2>
+            <p class="text-xs text-[#787b86]">
+              Tracks each position's dynamic profit target, suggested target date countdown, and dynamic ATR trailing stop-loss.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="openDirectTradeModal('BUY')" class="tv-btn-green px-3 py-1.5 text-xs">
+              + Record a Buy
+            </button>
+            <button onclick="openDirectTradeModal('SELL')" class="tv-btn-red px-3 py-1.5 text-xs">
+              - Record a Sell
+            </button>
+            <button onclick="switchTab('indices')" class="tv-btn-secondary px-3 py-1.5 text-xs">
+              Check EGX30 / 70 / 33 First
+            </button>
+            <button onclick="switchTab('terminal')" class="tv-btn-primary px-3 py-1.5 text-xs">
+              Ask AI Advisor
+            </button>
+          </div>
+        </div>
+
+        <div id="openPositionsContainer" class="mt-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 2: EGX INDICES (3-YEAR ANALYSIS: EGX30, EGX70 EWI, EGX33)       -->
+    <!-- =================================================================== -->
+    <section id="view-indices" class="hidden space-y-4">
+      <div class="tv-panel p-4 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-white">EGX Market Indices — 3+ Year Structural &amp; Regime Analysis</h2>
+              <span class="px-2 py-0.5 rounded text-[11px] font-mono-num bg-[#2962ff]/20 text-[#2962ff] border border-[#2962ff]/40">
+                EGX 30 • EGX 70 EWI • EGX 33 Shariah
+              </span>
+            </div>
+            <p class="text-xs text-[#787b86] mt-0.5">
+              Compares 3-year historical returns, CAGR, max drawdowns, and generates dynamic Target Price, Target Timeframe, and Stop-Loss on Daily (`1D`), Weekly (`1W`), or Monthly (`1M`) candles.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs text-[#787b86] font-medium">Candle Timeframe:</span>
+            <button onclick="changeIndexTimeframe('1D')" id="idx-tf-1D" class="tf-pill tf-pill-active">1D Daily</button>
+            <button onclick="changeIndexTimeframe('1W')" id="idx-tf-1W" class="tf-pill">1W Weekly</button>
+            <button onclick="changeIndexTimeframe('1M')" id="idx-tf-1M" class="tf-pill">1M Monthly</button>
+            <button onclick="loadAllIndicesOverview()" id="btnRefreshIndices" class="tv-btn-primary px-3 py-1.5 text-xs ml-1">
+              ↻ Refresh 3Y Indices
+            </button>
+          </div>
+        </div>
+
+        <!-- Cross-Index Relative Strength & Market Breadth Banner -->
+        <div id="indicesBreadthBanner" class="bg-[#131722] border border-[#2a2e39] rounded p-3.5 text-xs space-y-2">
+          <div class="text-[#787b86]">Loading 3-year historical data for EGX 30, EGX 70 EWI, and EGX 33 Shariah...</div>
+        </div>
+
+        <!-- 3 Index Cards Grid (EGX30, EGX70, EGX33) -->
+        <div id="indicesCardsContainer" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Selected Index 3-Year Deep-Dive Chart Panel -->
+      <div id="indexDeepDivePanel" class="tv-panel p-4 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <h3 id="idxChartTitle" class="text-base font-bold text-white">
+              Select any Index Card above to inspect its 3-Year Interactive &amp; Vision Chart
+            </h3>
+            <p id="idxChartSubtitle" class="text-xs text-[#787b86]">
+              Displays 3+ years of candles, 50-MA, 200-MA, Dynamic Target Level, and Support/Stop-Loss Level.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="loadSingleIndexDeepDive('EGX30')" class="tv-btn-secondary px-2.5 py-1 text-xs font-mono-num">EGX30 Chart</button>
+            <button onclick="loadSingleIndexDeepDive('EGX70')" class="tv-btn-secondary px-2.5 py-1 text-xs font-mono-num">EGX70 Chart</button>
+            <button onclick="loadSingleIndexDeepDive('EGX33')" class="tv-btn-secondary px-2.5 py-1 text-xs font-mono-num">EGX33 Chart</button>
+          </div>
+        </div>
+
+        <div id="tvIndexChartContainer" class="w-full h-[400px] bg-[#131722] border border-[#2a2e39] rounded"></div>
+
+        <div id="idxStaticPngWrapper" class="hidden bg-[#131722] border border-[#2a2e39] rounded p-3">
+          <div class="text-xs font-semibold text-white mb-2">Generated High-DPI Index Chart PNG</div>
+          <img id="idxStaticChartImg" src="" alt="Index Chart" class="w-full rounded border border-[#2a2e39]" />
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 3: AI ADVISOR & PRESET QUESTIONS (TERMINAL)                     -->
+    <!-- =================================================================== -->
+    <section id="view-terminal" class="hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+        <!-- LEFT COLUMN: Ticker + Timeframe + Preset Questions (5 cols) -->
+        <div class="lg:col-span-5 tv-panel p-4 flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <div class="border-b border-[#2a2e39] pb-3">
+              <h2 class="text-base font-bold text-white">AI Stock &amp; Index Advisor</h2>
+              <p class="text-xs text-[#787b86] mt-0.5">
+                Pick any EGX stock or index (`EGX30`, `EGX70`, `EGX33`), choose your candle (`1D`, `1W`, `1M`), and get a dynamic Target Price, Target Timeframe, and Stop-Loss.
+              </p>
+            </div>
+
+            <!-- Step 1: Pick a Stock or Index + Candle Timeframe -->
+            <div class="space-y-2">
+              <label class="block text-xs font-semibold text-[#d1d4dc]">
+                Step 1: Choose Ticker / Index &amp; Candle Timeframe
+              </label>
+              <div class="flex gap-2">
+                <input
+                  id="terminalTickerInput"
+                  type="text"
+                  value="COMI.CA"
+                  placeholder="e.g. COMI.CA, SWDY.CA, EGX30"
+                  class="tv-input flex-1 font-mono-num uppercase"
+                />
+                <select
+                  id="terminalTimeframeSelect"
+                  onchange="syncGlobalTimeframe(this.value)"
+                  class="tv-input font-mono-num text-xs"
+                >
+                  <option value="1D">1D Daily</option>
+                  <option value="1W">1W Weekly</option>
+                  <option value="1M">1M Monthly</option>
+                </select>
+                <button
+                  onclick="runTerminalAnalysis()"
+                  id="btnTerminalAnalyze"
+                  class="tv-btn-primary px-4 py-2 text-xs whitespace-nowrap"
+                >
+                  Run Analysis
+                </button>
+              </div>
+
+              <!-- Quick Indices Chips -->
+              <div class="pt-1">
+                <div class="text-[11px] text-[#787b86] mb-1">EGX Market Indices (3Y+):</div>
+                <div class="flex flex-wrap gap-1.5">
+                  <button onclick="selectQuickTicker('EGX30')" class="px-2 py-1 text-[11px] font-mono-num bg-[#2962ff]/15 border border-[#2962ff]/50 text-white rounded hover:bg-[#2962ff]/30">EGX30 (Large-Cap)</button>
+                  <button onclick="selectQuickTicker('EGX70')" class="px-2 py-1 text-[11px] font-mono-num bg-[#2962ff]/15 border border-[#2962ff]/50 text-white rounded hover:bg-[#2962ff]/30">EGX70 EWI (Small/Mid)</button>
+                  <button onclick="selectQuickTicker('EGX33')" class="px-2 py-1 text-[11px] font-mono-num bg-[#2962ff]/15 border border-[#2962ff]/50 text-white rounded hover:bg-[#2962ff]/30">EGX33 (Shariah)</button>
+                </div>
+              </div>
+
+              <!-- Quick Popular EGX Stock Chips -->
+              <div>
+                <div class="text-[11px] text-[#787b86] mb-1">Popular EGX Equities:</div>
+                <div class="flex flex-wrap gap-1.5">
+                  <button onclick="selectQuickTicker('COMI.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">COMI.CA (CIB)</button>
+                  <button onclick="selectQuickTicker('SWDY.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">SWDY.CA (Elsewedy)</button>
+                  <button onclick="selectQuickTicker('FWRY.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">FWRY.CA (Fawry)</button>
+                  <button onclick="selectQuickTicker('TMGH.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">TMGH.CA (TMG)</button>
+                  <button onclick="selectQuickTicker('ABUK.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">ABUK.CA (Abu Qir)</button>
+                  <button onclick="selectQuickTicker('EFID.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">EFID.CA (Edita)</button>
+                  <button onclick="selectQuickTicker('HRHO.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">HRHO.CA (EFG)</button>
+                  <button onclick="selectQuickTicker('ETEL.CA')" class="px-2 py-1 text-[11px] font-mono-num bg-[#131722] border border-[#2a2e39] rounded hover:border-[#2962ff]">ETEL.CA (Telecom)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: 1-Click Preset Questions -->
+            <div>
+              <label class="block text-xs font-semibold text-[#d1d4dc] mb-1.5">
+                Step 2: 1-Click Preset Prompts
+              </label>
+              <div class="grid grid-cols-1 gap-1.5">
+                <button
+                  onclick="sendPresetQuestion('Should I buy right now? Give me the dynamic Target Price, expected Target Timeframe, and Stop-Loss.')"
+                  class="preset-chip"
+                >
+                  <span class="text-[#089981] font-semibold">Buy &amp; Target Check:</span>
+                  "Should I buy right now? Give me the Target Price, Target Time, and Stop-Loss."
+                </button>
+
+                <button
+                  onclick="sendPresetQuestion('Analyze the Weekly (1W) candle trend structure, key support/resistance, and medium-term target.')"
+                  class="preset-chip"
+                >
+                  <span class="text-[#2962ff] font-semibold">Weekly (1W) Swing View:</span>
+                  "Analyze the Weekly candle structure and medium-term target."
+                </button>
+
+                <button
+                  onclick="sendPresetQuestion('Is the price cheap or stretched right now? Should I wait for a pullback before entering?')"
+                  class="preset-chip"
+                >
+                  <span class="text-[#f59e0b] font-semibold">Entry Timing Check:</span>
+                  "Is the price cheap or stretched right now? Should I wait for a dip?"
+                </button>
+
+                <button
+                  onclick="sendPresetQuestion('How much money and how many shares should I safely allocate based on my cash and stop-loss risk?')"
+                  class="preset-chip"
+                >
+                  <span class="text-[#2962ff] font-semibold">Position Sizing:</span>
+                  "How much money and how many shares should I safely buy?"
+                </button>
+              </div>
+            </div>
+
+            <!-- Custom Question Box -->
+            <div>
+              <label class="block text-xs font-semibold text-[#d1d4dc] mb-1.5">
+                Or Type Your Own Question:
+              </label>
+              <div class="flex gap-2">
+                <input
+                  id="terminalCustomPrompt"
+                  type="text"
+                  placeholder="Ask anything about any stock or EGX30/70/33..."
+                  class="tv-input flex-1"
+                  onkeydown="if(event.key==='Enter') runTerminalAnalysis()"
+                />
+                <button
+                  onclick="runTerminalAnalysis()"
+                  class="tv-btn-primary px-4 py-2 text-xs"
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-[#787b86] border-t border-[#2a2e39] pt-2.5">
+            Every recommendation is automatically saved by <strong>Date, Stock/Index, Candle Timeframe, and Source</strong> in Tab 5 for live accuracy evaluation.
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Dynamic Action Plan Result + Chat Log (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+
+          <!-- Dynamic Actionable Recommendation Card -->
+          <div id="latestProposalCard" class="tv-panel p-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+              <div>
+                <span id="proposalSubHeader" class="text-xs text-[#787b86]">Latest Dynamic Action Plan</span>
+                <h3 id="proposalTitle" class="text-base font-bold text-white">
+                  Select a stock or index on the left to generate a dynamic Target Price, Target Time &amp; Stop-Loss
+                </h3>
+              </div>
+              <span id="proposalBadge" class="px-2.5 py-1 rounded text-xs font-bold bg-[#2a2e39] text-[#d1d4dc]">
+                READY
+              </span>
+            </div>
+
+            <!-- 5 Key Dynamic Action Numbers -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5 my-3">
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-2.5">
+                <div class="text-[11px] text-[#787b86]">1. Entry Level</div>
+                <div id="propEntryPrice" class="text-sm font-bold font-mono-num text-white mt-0.5">—</div>
+                <div id="propCandleLabel" class="text-[10px] text-[#787b86]">Current price</div>
+              </div>
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-2.5">
+                <div class="text-[11px] text-[#089981]">2. Dynamic Target</div>
+                <div id="propTargetPrice" class="text-sm font-bold font-mono-num text-[#089981] mt-0.5">—</div>
+                <div id="propTargetUpside" class="text-[10px] text-[#787b86]">Structure + ATR</div>
+              </div>
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-2.5">
+                <div class="text-[11px] text-[#f59e0b]">3. Target Timeframe</div>
+                <div id="propTargetTime" class="text-sm font-bold font-mono-num text-[#f59e0b] mt-0.5">—</div>
+                <div id="propTargetDate" class="text-[10px] text-[#787b86]">Expected date</div>
+              </div>
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-2.5">
+                <div class="text-[11px] text-[#f23645]">4. Safety Stop-Loss</div>
+                <div id="propStopLoss" class="text-sm font-bold font-mono-num text-[#f23645] mt-0.5">—</div>
+                <div id="propStopPct" class="text-[10px] text-[#787b86]">Exit if breached</div>
+              </div>
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-2.5 col-span-2 sm:col-span-1">
+                <div class="text-[11px] text-[#2962ff]">5. Safe Size</div>
+                <div id="propShares" class="text-sm font-bold font-mono-num text-white mt-0.5">—</div>
+                <div id="propAllocationEgp" class="text-[10px] text-[#787b86]">Max 20% cap</div>
+              </div>
+            </div>
+
+            <!-- Plain-English Summary Reasons -->
+            <div id="proposalDetailsBox" class="hidden bg-[#131722] border border-[#2a2e39] rounded p-3 text-xs space-y-2 mb-3">
+              <div>
+                <span class="font-semibold text-[#089981]">Technical &amp; Structural Drivers:</span>
+                <p id="propWhyGood" class="text-[#d1d4dc] mt-0.5"></p>
+              </div>
+              <div>
+                <span class="font-semibold text-[#f23645]">Invalidation &amp; Exit Rule:</span>
+                <p id="propWhenExit" class="text-[#d1d4dc] mt-0.5"></p>
+              </div>
+            </div>
+
+            <!-- Action Buttons on the Proposal -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#2a2e39]">
+              <div id="propSavedStatus" class="text-xs text-[#787b86]">
+                Saved automatically to Recommendations Ledger by Date, Stock &amp; Source
+              </div>
+              <div class="flex items-center gap-2">
+                <button
+                  onclick="switchTab('chart')"
+                  class="tv-btn-secondary px-3 py-1.5 text-xs"
+                >
+                  Open Interactive Chart
+                </button>
+                <button
+                  id="btnExecuteThesis"
+                  onclick="executeCurrentProposedThesis()"
+                  disabled
+                  class="tv-btn-green px-3 py-1.5 text-xs disabled:opacity-40"
+                >
+                  Execute &amp; Open Trade
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat History Stream -->
+          <div class="tv-panel p-4">
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-[#2a2e39]">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#787b86]">
+                Advisor Analysis Log
+              </h3>
+              <button onclick="clearChatLog()" class="text-[11px] text-[#787b86] hover:text-white">
+                Clear View
+              </button>
+            </div>
+            <div id="chatMessagesContainer" class="space-y-3 max-h-[420px] overflow-y-auto pr-1 text-xs">
+              <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 text-[#d1d4dc]">
+                <div class="font-semibold text-white mb-1">Dynamic Target, Timeframe &amp; Stop-Loss Engine Ready</div>
+                <p class="text-[#787b86]">
+                  Choose any stock or EGX index (`EGX30`, `EGX70`, `EGX33`), pick your candle (`1D Daily`, `1W Weekly`, or `1M Monthly`), and click <strong>Run Analysis</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 4: INTERACTIVE STOCK/INDEX CHART (1D / 1W / 1M CANDLES)         -->
+    <!-- =================================================================== -->
+    <section id="view-chart" class="hidden space-y-4">
+      <div class="tv-panel p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="chartStockTitle" class="text-base font-bold text-white">COMI.CA — Price Chart &amp; Dynamic Levels</h2>
+              <span id="chartRecommendationPill" class="px-2 py-0.5 rounded text-xs font-bold bg-[#2a2e39] text-[#d1d4dc]">
+                1D Daily
+              </span>
+            </div>
+            <p class="text-xs text-[#787b86]">
+              Blue line = Entry Level • Green line = Dynamic Target Price • Red line = Dynamic Stop-Loss
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs text-[#787b86]">Candle:</span>
+            <button onclick="switchChartTimeframe('1D')" id="chart-tf-1D" class="tf-pill tf-pill-active">1D Daily</button>
+            <button onclick="switchChartTimeframe('1W')" id="chart-tf-1W" class="tf-pill">1W Weekly</button>
+            <button onclick="switchChartTimeframe('1M')" id="chart-tf-1M" class="tf-pill">1M Monthly</button>
+            <button onclick="toggleStaticPngChart()" class="tv-btn-secondary px-3 py-1.5 text-xs ml-1">
+              Show / Hide Vision PNG Chart
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Cards Explaining the Numbers -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 my-4">
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-3">
+            <div class="text-xs text-[#787b86]">1. Trend Structure</div>
+            <div id="simpleTrendStatus" class="text-sm font-bold text-white mt-1">—</div>
+            <div id="simpleTrendExplain" class="text-[11px] text-[#787b86] mt-1">
+              Compares current level to 50-MA &amp; 200-MA on selected candle.
+            </div>
+          </div>
+
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-3">
+            <div class="text-xs text-[#787b86]">2. Momentum (RSI 14)</div>
+            <div id="simpleRsiStatus" class="text-sm font-bold text-white mt-1">—</div>
+            <div id="simpleRsiExplain" class="text-[11px] text-[#787b86] mt-1">
+              Below 36 = oversold; 42–68 = constructive; above 72 = stretched.
+            </div>
+          </div>
+
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-3">
+            <div class="text-xs text-[#089981]">3. Dynamic Target &amp; Timeframe</div>
+            <div id="simpleTargetStatus" class="text-sm font-bold font-mono-num text-[#089981] mt-1">—</div>
+            <div id="simpleTargetExplain" class="text-[11px] text-[#787b86] mt-1">
+              Calculated from structural resistance + ATR velocity.
+            </div>
+          </div>
+
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-3">
+            <div class="text-xs text-[#f23645]">4. Dynamic Safety Stop-Loss</div>
+            <div id="simpleStopStatus" class="text-sm font-bold font-mono-num text-[#f23645] mt-1">—</div>
+            <div id="simpleStopExplain" class="text-[11px] text-[#787b86] mt-1">
+              Placed below structural support &amp; ATR volatility buffer.
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive TradingView Lightweight Chart -->
+        <div id="tvChartContainer" class="w-full h-[440px] bg-[#131722] border border-[#2a2e39] rounded"></div>
+
+        <!-- Optional Saved PNG Chart Preview (Generated by Python mplfinance) -->
+        <div id="staticPngContainer" class="hidden mt-4 bg-[#131722] border border-[#2a2e39] rounded p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-white">Python Generated Vision Chart (<code id="pngPathLabel">static/charts/</code>)</span>
+          </div>
+          <img id="staticChartImg" src="" alt="Generated Swing Chart" class="w-full rounded border border-[#2a2e39]" />
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- TAB 5: RECOMMENDATIONS TRACKER, LIVE EVALUATION & LESSONS           -->
+    <!-- =================================================================== -->
+    <section id="view-memory" class="hidden space-y-4">
+
+      <!-- Recommendations Evaluation KPI Strip -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="tv-panel p-4">
+          <div class="text-xs text-[#787b86]">Total Saved Recommendations</div>
+          <div id="recStatTotal" class="text-xl font-bold font-mono-num text-white mt-1">0</div>
+          <div id="recStatBreakdown" class="text-xs text-[#787b86] mt-1">0 Active • 0 Resolved</div>
+        </div>
+        <div class="tv-panel p-4">
+          <div class="text-xs text-[#787b86]">Overall Accuracy Score</div>
+          <div id="recStatAccuracy" class="text-xl font-bold font-mono-num text-[#089981] mt-1">0.0%</div>
+          <div id="recStatFavorableRate" class="text-xs text-[#787b86] mt-1">Positive / Validated Rate: 0.0%</div>
+        </div>
+        <div class="tv-panel p-4">
+          <div class="text-xs text-[#787b86]">Target Hits vs Stop-Loss Hits</div>
+          <div id="recStatHits" class="text-xl font-bold font-mono-num text-white mt-1">0 Wins / 0 Stops</div>
+          <div id="recStatMfe" class="text-xs text-[#787b86] mt-1">Avg Peak Excursion (MFE): 0.0%</div>
+        </div>
+        <div class="tv-panel p-4">
+          <div class="text-xs text-[#787b86]">Accuracy by Source Leaderboard</div>
+          <div id="recStatSources" class="text-xs text-[#d1d4dc] mt-1.5 space-y-1">
+            <div class="text-[#787b86]">No sources evaluated yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Recommendations Ledger & Live Evaluation Table -->
+      <div class="tv-panel p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <h2 class="text-base font-bold text-white">Saved Recommendations Ledger &amp; Live Time/Price Evaluation</h2>
+            <p class="text-xs text-[#787b86]">
+              Every recommendation is logged by <strong>Date, Stock/Index, Candle (`1D`/`1W`/`1M`), and Source</strong>, and automatically evaluated against subsequent daily High/Low bars and live prices.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openManualRecModal()" class="tv-btn-secondary px-3 py-1.5 text-xs">
+              + Log External Recommendation
+            </button>
+            <button onclick="evaluateAllRecommendationsUI()" class="tv-btn-primary px-3 py-1.5 text-xs">
+              ↻ Evaluate All Now
+            </button>
+          </div>
+        </div>
+
+        <div id="recommendationsTableContainer" class="mt-3 overflow-x-auto">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Lessons Learned -->
+      <div class="tv-panel p-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-[#2a2e39]">
+          <div>
+            <h2 class="text-base font-bold text-white">Lessons Learned From Past Trades &amp; Evaluations</h2>
+            <p class="text-xs text-[#787b86]">
+              Rules extracted by the Self-Reflection Engine and automatically injected into future stock &amp; index analyses.
+            </p>
+          </div>
+          <button onclick="runSelfReflectionLoop()" id="btnReflection" class="tv-btn-primary px-3 py-1.5 text-xs">
+            Run Reflection &amp; Lesson Check
+          </button>
+        </div>
+        <div id="lessonsContainer" class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Full Thesis & Trade History -->
+      <div class="tv-panel p-4">
+        <div class="pb-3 border-b border-[#2a2e39]">
+          <h2 class="text-base font-bold text-white">All Saved Theses &amp; Position History</h2>
+          <p class="text-xs text-[#787b86]">
+            Historical log of proposed, active, trimmed, and closed theses.
+          </p>
+        </div>
+        <div id="thesesTableContainer" class="mt-3 overflow-x-auto">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: LOG A DIRECT TRADE (BUY OR SELL)                               -->
+  <!-- ===================================================================== -->
+  <div id="directTradeModal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+    <div class="tv-panel w-full max-w-md p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#2a2e39] pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white">Log a Trade Directly to Database</h3>
+          <p class="text-xs text-[#787b86]">Automatically computes dynamic Target Price, Target Timeframe &amp; Stop-Loss</p>
+        </div>
+        <button onclick="closeDirectTradeModal()" class="text-[#787b86] hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[#d1d4dc] font-semibold mb-1">Trade Type (Buy or Sell)</label>
+          <select id="dtAction" class="tv-input w-full">
+            <option value="BUY">BUY (Open or Add to Position)</option>
+            <option value="SELL">SELL (Close or Trim Position)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Ticker Symbol</label>
+            <input id="dtTicker" type="text" value="COMI.CA" placeholder="e.g. COMI.CA" class="tv-input w-full font-mono-num uppercase" />
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Company Name (Optional)</label>
+            <input id="dtCompanyName" type="text" placeholder="e.g. CIB Egypt" class="tv-input w-full" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Number of Shares</label>
+            <input id="dtShares" type="number" step="1" min="1" value="100" class="tv-input w-full font-mono-num" />
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Price per Share (EGP)</label>
+            <input id="dtPrice" type="number" step="0.01" min="0.01" value="80.00" class="tv-input w-full font-mono-num" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[#d1d4dc] font-semibold mb-1">Extra Broker Fees / Commission (EGP)</label>
+          <input id="dtExtraFees" type="number" step="0.01" min="0" value="0" class="tv-input w-full font-mono-num" />
+        </div>
+
+        <div>
+          <label class="block text-[#d1d4dc] font-semibold mb-1">Short Note (Optional)</label>
+          <input id="dtNotes" type="text" placeholder="e.g. Bought via Thndr app" class="tv-input w-full" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#2a2e39]">
+        <button onclick="closeDirectTradeModal()" class="tv-btn-secondary px-4 py-2 text-xs">Cancel</button>
+        <button onclick="submitDirectTrade()" id="btnSubmitDirectTrade" class="tv-btn-primary px-4 py-2 text-xs">
+          Save Trade to DB
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: SAVE MANUAL / EXTERNAL RECOMMENDATION                          -->
+  <!-- ===================================================================== -->
+  <div id="manualRecModal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4">
+    <div class="tv-panel w-full max-w-md p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-[#2a2e39] pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white">Save Recommendation to Evaluation Ledger</h3>
+          <p class="text-xs text-[#787b86]">Track any AI, analyst, or personal call by date, stock/index, and source</p>
+        </div>
+        <button onclick="closeManualRecModal()" class="text-[#787b86] hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Stock or Index</label>
+            <input id="mrTicker" type="text" value="COMI.CA" placeholder="e.g. COMI.CA or EGX30" class="tv-input w-full font-mono-num uppercase" />
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Source Name</label>
+            <input id="mrSource" type="text" value="Manual Analyst Call" placeholder="e.g. EFG Research / Personal" class="tv-input w-full" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Action</label>
+            <select id="mrAction" class="tv-input w-full">
+              <option value="BUY">BUY</option>
+              <option value="WAIT FOR DIP">WAIT FOR DIP</option>
+              <option value="AVOID">AVOID</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Candle</label>
+            <select id="mrTimeframe" class="tv-input w-full font-mono-num">
+              <option value="1D">1D Daily</option>
+              <option value="1W">1W Weekly</option>
+              <option value="1M">1M Monthly</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Rec Date</label>
+            <input id="mrDate" type="date" class="tv-input w-full font-mono-num" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Entry Price</label>
+            <input id="mrEntry" type="number" step="0.01" value="120.00" class="tv-input w-full font-mono-num" />
+          </div>
+          <div>
+            <label class="block text-[#089981] font-semibold mb-1">Target Price</label>
+            <input id="mrTarget" type="number" step="0.01" value="142.00" class="tv-input w-full font-mono-num" />
+          </div>
+          <div>
+            <label class="block text-[#f23645] font-semibold mb-1">Stop-Loss</label>
+            <input id="mrStop" type="number" step="0.01" value="111.00" class="tv-input w-full font-mono-num" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Target Horizon (Days)</label>
+            <input id="mrTargetDays" type="number" step="1" min="1" value="45" class="tv-input w-full font-mono-num" />
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Conviction (1–100)</label>
+            <input id="mrConviction" type="number" step="1" min="1" max="100" value="80" class="tv-input w-full font-mono-num" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[#d1d4dc] font-semibold mb-1">Rationale / Notes</label>
+          <input id="mrRationale" type="text" placeholder="Why was this recommended?" class="tv-input w-full" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#2a2e39]">
+        <button onclick="closeManualRecModal()" class="tv-btn-secondary px-4 py-2 text-xs">Cancel</button>
+        <button onclick="submitManualRecommendation()" id="btnSubmitManualRec" class="tv-btn-primary px-4 py-2 text-xs">
+          Save &amp; Evaluate
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: SYSTEM & PORTFOLIO SETTINGS                                    -->
+  <!-- ===================================================================== -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/75 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="tv-panel w-full max-w-lg p-5 space-y-4 my-8">
+      <div class="flex items-center justify-between border-b border-[#2a2e39] pb-3">
+        <div>
+          <h3 class="text-base font-bold text-white">⚙ Portfolio &amp; AI Advisor Settings</h3>
+          <p class="text-xs text-[#787b86]">Configure your cash balance, risk limits, AI mode, and Gemini API key</p>
+        </div>
+        <button onclick="closeSettingsModal()" class="text-[#787b86] hover:text-white text-sm font-bold">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 space-y-2.5">
+          <div class="font-bold text-white uppercase tracking-wider text-[11px]">1. Account Cash &amp; Capital (EGP)</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">Available Cash Balance (EGP)</label>
+              <input id="setCashBalance" type="number" step="100" min="0" value="1000000" class="tv-input w-full font-mono-num" />
+            </div>
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">Starting Capital Baseline (EGP)</label>
+              <input id="setInitialCapital" type="number" step="100" min="100" value="1000000" class="tv-input w-full font-mono-num" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 space-y-2.5">
+          <div class="font-bold text-white uppercase tracking-wider text-[11px]">2. Safety &amp; Position Sizing Rules</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">Max % Per Single Stock (Default 20%)</label>
+              <input id="setMaxAllocPct" type="number" step="1" min="5" max="100" value="20" class="tv-input w-full font-mono-num" />
+            </div>
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">Stop-Loss ATR Multiplier (Default 2.2x)</label>
+              <input id="setAtrMultiplier" type="number" step="0.1" min="1.0" max="5.0" value="2.2" class="tv-input w-full font-mono-num" />
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 space-y-2.5">
+          <div class="font-bold text-white uppercase tracking-wider text-[11px]">3. AI Engine &amp; Google Gemini Key</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">AI Operating Mode</label>
+              <select id="setAiMode" class="tv-input w-full">
+                <option value="HYBRID_PRO_SUBSCRIPTION">Hybrid Mode (Antigravity + Local Math)</option>
+                <option value="GEMINI_API_KEY">Direct Gemini API Key Mode</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[#d1d4dc] font-semibold mb-1">Preferred Gemini Model</label>
+              <select id="setPreferredModel" class="tv-input w-full font-mono-num">
+                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[#d1d4dc] font-semibold mb-1">Google Gemini API Key (Optional if using Hybrid Mode)</label>
+            <input id="setGeminiApiKey" type="password" placeholder="AIzaSy..." class="tv-input w-full font-mono-num" />
+          </div>
+        </div>
+
+        <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 space-y-2.5">
+          <div class="font-bold text-white uppercase tracking-wider text-[11px]">4. Account Reset</div>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-[#787b86]">
+              Want to start completely fresh and clear all trades &amp; history?
+            </div>
+            <button onclick="confirmResetAllData()" class="tv-btn-red px-3 py-1.5 text-xs">
+              Wipe All Data &amp; Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#2a2e39]">
+        <button onclick="closeSettingsModal()" class="tv-btn-secondary px-4 py-2 text-xs">Cancel</button>
+        <button onclick="saveSettingsModal()" id="btnSaveSettings" class="tv-btn-primary px-4 py-2 text-xs">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let currentState = null;
+    let latestAnalyzedThesis = null;
+    let activeTicker = 'COMI.CA';
+    let activeTimeframe = '1D';
+    let activeIndexTimeframe = '1D';
+    let indicesOverviewCache = null;
+
+    let tvChart = null;
+    let candleSeries = null;
+    let sma50Series = null;
+    let sma200Series = null;
+    let priceLines = [];
+
+    let tvIndexChart = null;
+    let idxCandleSeries = null;
+    let idxSma50Series = null;
+    let idxSma200Series = null;
+    let idxPriceLines = [];
+
+    function formatEGP(num) {
+      if (num === null || num === undefined || isNaN(num)) return '—';
+      return Number(num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' EGP';
+    }
+
+    function formatNum(num, decimals = 2) {
+      if (num === null || num === undefined || isNaN(num)) return '—';
+      return Number(num).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    }
+
+    function syncGlobalTimeframe(tf) {
+      activeTimeframe = tf;
+      const hdrSel = document.getElementById('headerTimeframeSelect');
+      const termSel = document.getElementById('terminalTimeframeSelect');
+      if (hdrSel && hdrSel.value !== tf) hdrSel.value = tf;
+      if (termSel && termSel.value !== tf) termSel.value = tf;
+
+      ['1D', '1W', '1M'].forEach(k => {
+        const btn = document.getElementById('chart-tf-' + k);
+        if (btn) {
+          if (k === tf) btn.classList.add('tf-pill-active');
+          else btn.classList.remove('tf-pill-active');
+        }
+      });
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['portfolio', 'indices', 'terminal', 'chart', 'memory'];
+      tabs.forEach(t => {
+        const view = document.getElementById('view-' + t);
+        const btn = document.getElementById('tab-' + t);
+        if (t === tabId) {
+          view.classList.remove('hidden');
+          btn.classList.add('tv-tab-active');
+        } else {
+          view.classList.add('hidden');
+          btn.classList.remove('tv-tab-active');
+        }
+      });
+
+      if (tabId === 'indices' && !indicesOverviewCache) {
+        loadAllIndicesOverview();
+      }
+
+      if (tabId === 'chart' && tvChart) {
+        setTimeout(() => {
+          const container = document.getElementById('tvChartContainer');
+          if (container) {
+            tvChart.applyOptions({ width: container.clientWidth });
+            tvChart.timeScale().fitContent();
+          }
+        }, 50);
+      }
+
+      if (tabId === 'indices' && tvIndexChart) {
+        setTimeout(() => {
+          const container = document.getElementById('tvIndexChartContainer');
+          if (container) {
+            tvIndexChart.applyOptions({ width: container.clientWidth });
+            tvIndexChart.timeScale().fitContent();
+          }
+        }, 50);
+      }
+    }
+
+    async function fetchSystemState() {
+      try {
+        const res = await fetch('/api/state');
+        const data = await res.json();
+        currentState = data;
+        const portfolio = data.portfolio || {};
+        renderPortfolioSummary(portfolio.summary || portfolio, data.recommendation_stats);
+        renderOpenPositions(portfolio.open_positions || []);
+        renderRecommendationsSection(data.recommendation_stats || {}, data.recommendations || []);
+        renderLessons(data.lessons || []);
+        renderThesesHistory(data.theses || []);
+      } catch (err) {
+        console.error('Failed to load state:', err);
+      }
+    }
+
+    function renderPortfolioSummary(summary, recStats) {
+      if (!summary) return;
+      document.getElementById('metricTotalEquity').textContent = formatEGP(summary.total_equity_egp);
+      document.getElementById('metricCashBalance').textContent = formatEGP(summary.cash_balance_egp);
+      document.getElementById('metricInvestedValue').textContent = formatEGP(summary.invested_value_egp ?? summary.invested_market_value_egp ?? 0);
+
+      const pnlEgp = summary.total_unrealized_pnl_egp || 0;
+      const pnlPct = summary.total_unrealized_pnl_pct || 0;
+      const sign = pnlEgp >= 0 ? '+' : '';
+      const pnlEl = document.getElementById('metricUnrealizedPct');
+      pnlEl.textContent = `Open Profit/Loss: ${sign}${formatEGP(pnlEgp)} (${sign}${pnlPct.toFixed(2)}%)`;
+      pnlEl.className = 'text-xs mt-1 font-medium ' + (pnlEgp > 0 ? 'text-[#089981]' : pnlEgp < 0 ? 'text-[#f23645]' : 'text-[#787b86]');
+
+      const count = summary.open_positions_count || 0;
+      document.getElementById('metricOpenPositionsCount').textContent =
+        `${count} Open Trade${count === 1 ? '' : 's'} (Max 20% per stock)`;
+
+      if (recStats && recStats.total_recommendations > 0) {
+        document.getElementById('metricRecAccuracy').textContent =
+          `${recStats.overall_accuracy_score_pct}% Score (${recStats.positive_or_validated_rate_pct}% Favorable)`;
+        document.getElementById('metricRecSummarySub').textContent =
+          `${recStats.total_recommendations} Saved Recs • ${recStats.target_hit_count} Target Hits`;
+      } else {
+        document.getElementById('metricRecAccuracy').textContent = 'Ready';
+        document.getElementById('metricRecSummarySub').textContent = 'Run any analysis to log & track accuracy';
+      }
+    }
+
+    function renderOpenPositions(positions) {
+      const container = document.getElementById('openPositionsContainer');
+      if (!positions || positions.length === 0) {
+        container.innerHTML = `
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-6 text-center space-y-3">
+            <div class="text-sm font-semibold text-white">You have no open stock trades right now.</div>
+            <p class="text-xs text-[#787b86] max-w-lg mx-auto">
+              Check the <strong>3-Year EGX Index Regime (EGX30 / EGX70 / EGX33)</strong> or ask the <strong>AI Advisor</strong> for a stock setup with a dynamic Target Price, Target Timeframe, and Stop-Loss.
+            </p>
+            <div class="flex flex-wrap justify-center gap-2 pt-1">
+              <button onclick="switchTab('indices')" class="tv-btn-secondary px-4 py-2 text-xs">
+                View EGX30 / 70 / 33 (3Y)
+              </button>
+              <button onclick="switchTab('terminal')" class="tv-btn-primary px-4 py-2 text-xs">
+                Ask AI Advisor About a Stock
+              </button>
+              <button onclick="openDirectTradeModal('BUY')" class="tv-btn-green px-4 py-2 text-xs">
+                + Log a Buy Trade
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3">` + positions.map(pos => {
+        const pnlEgp = pos.unrealized_pnl_egp || 0;
+        const pnlPct = pos.unrealized_pnl_pct || 0;
+        const sign = pnlEgp >= 0 ? '+' : '';
+        const pnlColor = pnlEgp >= 0 ? 'text-[#089981]' : 'text-[#f23645]';
+        const progress = Math.max(0, Math.min(100, pos.progress_to_tp_pct || 0));
+        const targetGainPct = pos.target_gain_pct || 20;
+        const updatedTimeStr = pos.updated_at || '';
+
+        return `
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-4 flex flex-col justify-between space-y-3">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-base font-bold font-mono-num text-white">${pos.ticker}</span>
+                    <span class="text-xs text-[#787b86]">${pos.company_name || ''}</span>
+                    <span class="px-2 py-0.5 rounded bg-[#1e222d] border border-[#2962ff] text-xs font-mono-num font-bold text-white">
+                      Now: ${Number(pos.current_price).toFixed(2)} EGP
+                    </span>
+                  </div>
+                  <div class="text-xs text-[#787b86] mt-1">
+                    Shares: <span class="text-white font-mono-num font-semibold">${pos.current_shares}</span>
+                    • Entry: <span class="text-white font-mono-num">${Number(pos.entry_price).toFixed(2)} EGP</span>
+                    • Value: <span class="text-white font-mono-num font-semibold">${formatEGP(pos.market_value_egp)}</span>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-bold font-mono-num ${pnlColor}">${sign}${pnlPct.toFixed(2)}%</div>
+                  <div class="text-xs font-mono-num ${pnlColor}">${sign}${formatEGP(pnlEgp)}</div>
+                </div>
+              </div>
+
+              <!-- Progress Bar Toward Dynamic Target -->
+              <div class="mt-3">
+                <div class="flex justify-between text-[11px] mb-1">
+                  <span class="text-[#787b86]">Progress to Dynamic Target (${pos.target_price} EGP / +${Number(targetGainPct).toFixed(1)}%)</span>
+                  <span class="font-mono-num text-white font-semibold">${progress.toFixed(0)}%</span>
+                </div>
+                <div class="w-full h-2 bg-[#1e222d] rounded overflow-hidden border border-[#2a2e39]">
+                  <div class="h-full bg-[#089981]" style="width: ${progress}%"></div>
+                </div>
+              </div>
+
+              <!-- Key Numbers Row -->
+              <div class="grid grid-cols-3 gap-2 mt-3 text-xs">
+                <div class="bg-[#1e222d] p-2 rounded border border-[#2a2e39]">
+                  <div class="text-[10px] text-[#089981]">Dynamic Target</div>
+                  <div class="font-mono-num font-bold text-[#089981] text-sm">${Number(pos.target_price).toFixed(2)} EGP</div>
+                  <div class="text-[10px] text-[#787b86] mt-0.5">+${Number(targetGainPct).toFixed(1)}% upside</div>
+                </div>
+                <div class="bg-[#1e222d] p-2 rounded border border-[#2a2e39]">
+                  <div class="text-[10px] text-[#f23645]">Trailing Stop-Loss</div>
+                  <div class="font-mono-num font-bold text-[#f23645] text-sm">${Number(pos.trailing_stop_loss).toFixed(2)} EGP</div>
+                  <div class="text-[10px] text-[#787b86] mt-0.5">Dynamic ATR Stop</div>
+                </div>
+                <div class="bg-[#1e222d] p-2 rounded border border-[#2a2e39]">
+                  <div class="text-[10px] text-[#f59e0b]">Target Horizon</div>
+                  <div class="font-mono-num font-bold text-white text-sm">${pos.days_remaining}d left</div>
+                  <div class="text-[10px] text-[#787b86] mt-0.5">Target Date: ${pos.deadline_date}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#2a2e39]">
+              <div class="text-[11px] text-[#787b86] font-mono-num">
+                Updated: <span class="text-[#d1d4dc]">${updatedTimeStr}</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="promptUpdatePositionPrice('${pos.position_id}', '${pos.ticker}', ${pos.current_price})" class="tv-btn-secondary px-2.5 py-1 text-xs">
+                  ↻ Refresh
+                </button>
+                <button onclick="trimHalfPosition('${pos.position_id}', ${pos.current_price})" class="tv-btn-green px-2.5 py-1 text-xs" ${pos.partial_tp_taken ? 'disabled style="opacity:0.4"' : ''}>
+                  ${pos.partial_tp_taken ? '50% Trimmed' : 'Trim 50%'}
+                </button>
+                <button onclick="closeFullPosition('${pos.position_id}', '${pos.ticker}', ${pos.current_price})" class="tv-btn-red px-2.5 py-1 text-xs">
+                  Close Trade
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('') + `</div>`;
+    }
+
+    // =========================================================================
+    // TAB 2: 3-YEAR EGX INDEX ANALYSIS (EGX30, EGX70 EWI, EGX33 SHARIAH)
+    // =========================================================================
+
+    function changeIndexTimeframe(tf) {
+      activeIndexTimeframe = tf;
+      ['1D', '1W', '1M'].forEach(k => {
+        const btn = document.getElementById('idx-tf-' + k);
+        if (btn) {
+          if (k === tf) btn.classList.add('tf-pill-active');
+          else btn.classList.remove('tf-pill-active');
+        }
+      });
+      loadAllIndicesOverview();
+    }
+
+    async function loadAllIndicesOverview() {
+      const btn = document.getElementById('btnRefreshIndices');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Loading 3Y Data...';
+      }
+      try {
+        const res = await fetch(`/api/indices?timeframe=${encodeURIComponent(activeIndexTimeframe)}&lookback_years=3`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to load EGX indices');
+        indicesOverviewCache = data;
+        renderIndicesOverview(data);
+        await loadSingleIndexDeepDive('EGX30', false);
+        await fetchSystemState();
+      } catch (err) {
+        document.getElementById('indicesBreadthBanner').innerHTML =
+          `<span class="text-[#f23645]">Error loading indices: ${err.message}</span>`;
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '↻ Refresh 3Y Indices';
+        }
+      }
+    }
+
+    function renderIndicesOverview(data) {
+      const ci = data.comparative_insights || {};
+      const banner = document.getElementById('indicesBreadthBanner');
+      banner.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="font-bold text-white text-xs">
+            📊 3-Year Cross-Index Leadership &amp; Breadth Synthesis (${data.candle_timeframe_label || 'Daily 1D'})
+          </div>
+          <div class="flex flex-wrap gap-3 text-[11px] font-mono-num">
+            <span>1M Leader: <strong class="text-[#089981]">${ci.leader_1m?.ticker || '—'} (${ci.leader_1m?.return_pct >= 0 ? '+' : ''}${ci.leader_1m?.return_pct}%)</strong></span>
+            <span>6M Leader: <strong class="text-[#089981]">${ci.leader_6m?.ticker || '—'} (+${ci.leader_6m?.return_pct}%)</strong></span>
+            <span>1Y Leader: <strong class="text-[#089981]">${ci.leader_1y?.ticker || '—'} (+${ci.leader_1y?.return_pct}%)</strong></span>
+            <span>3Y Leader: <strong class="text-[#089981]">${ci.leader_3y?.ticker || '—'} (+${ci.leader_3y?.return_pct}%)</strong></span>
+          </div>
+        </div>
+        <p class="text-[#d1d4dc] text-xs">${ci.breadth_takeaway || ''}</p>
+      `;
+
+      const indicesMap = data.indices || {};
+      const order = ['EGX30', 'EGX70', 'EGX33'];
+      const cardsHtml = order.map(sym => {
+        const idx = indicesMap[sym];
+        if (!idx) return '';
+        const p3 = idx.performance_3y || {};
+        const reg = idx.regime || {};
+        const geom = idx.strategy_geometry || {};
+        const cur = idx.price?.current || 0;
+        const chg = idx.price?.daily_change_pct || 0;
+        const chgSign = chg >= 0 ? '+' : '';
+        const chgColor = chg >= 0 ? 'text-[#089981]' : 'text-[#f23645]';
+
+        const yrs = p3.yearly_returns_pct || {};
+        const yrBadges = Object.keys(yrs).map(y => {
+          const val = yrs[y];
+          const col = val >= 0 ? 'text-[#089981]' : 'text-[#f23645]';
+          return `<span class="px-1.5 py-0.5 bg-[#1e222d] border border-[#2a2e39] rounded font-mono-num text-[10px]">${y}: <strong class="${col}">${val >= 0 ? '+' : ''}${val}%</strong></span>`;
+        }).join(' ');
+
+        const fmtPct = (v) => {
+          if (v === undefined || v === null) return '—';
+          const c = v >= 0 ? 'text-[#089981]' : 'text-[#f23645]';
+          return `<span class="font-mono-num font-bold ${c}">${v >= 0 ? '+' : ''}${Number(v).toFixed(1)}%</span>`;
+        };
+
+        return `
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-4 flex flex-col justify-between space-y-3">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2 border-b border-[#2a2e39] pb-2.5">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-base font-bold font-mono-num text-white">${idx.ticker}</span>
+                    <span class="text-[11px] px-2 py-0.5 rounded bg-[#2a2e39] text-[#d1d4dc] font-semibold">${idx.candle_timeframe}</span>
+                  </div>
+                  <div class="text-xs text-[#787b86] mt-0.5">${idx.name}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-base font-bold font-mono-num text-white">${formatNum(cur)} pts</div>
+                  <div class="text-xs font-mono-num ${chgColor}">${chgSign}${Number(chg).toFixed(2)}%</div>
+                </div>
+              </div>
+
+              <!-- Regime & Action Verdict -->
+              <div class="bg-[#1e222d] border border-[#2a2e39] rounded p-2.5 text-xs space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-[#787b86]">Regime:</span>
+                  <span class="font-bold text-white">${reg.market_regime || '—'}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-[#787b86]">Recommendation:</span>
+                  <span class="font-bold text-[#2962ff]">${reg.action_recommendation || '—'}</span>
+                </div>
+              </div>
+
+              <!-- 3-Year Multi-Horizon Performance Grid -->
+              <div>
+                <div class="text-[11px] font-semibold text-[#787b86] mb-1.5">
+                  3-Year Multi-Horizon Performance (${idx.history_start_date} → ${idx.as_of_date})
+                </div>
+                <div class="grid grid-cols-4 gap-1.5 text-center text-xs bg-[#1e222d] p-2 rounded border border-[#2a2e39]">
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">1M</div>
+                    <div>${fmtPct(p3.return_1m_pct)}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">6M</div>
+                    <div>${fmtPct(p3.return_6m_pct)}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">1Y</div>
+                    <div>${fmtPct(p3.return_1y_pct)}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">3Y Total</div>
+                    <div>${fmtPct(p3.return_3y_pct)}</div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-1.5 text-center text-xs bg-[#1e222d] p-2 rounded border border-[#2a2e39] mt-1.5">
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">3Y CAGR</div>
+                    <div class="font-mono-num font-bold text-[#089981]">+${p3.cagr_3y_pct}%/yr</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">3Y Max DD</div>
+                    <div class="font-mono-num font-bold text-[#f23645]">${p3.max_drawdown_3y_pct}%</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-[#787b86]">Ann. Vol</div>
+                    <div class="font-mono-num font-bold text-white">${p3.annualized_volatility_pct}%</div>
+                  </div>
+                </div>
+                <div class="flex flex-wrap gap-1 mt-2">${yrBadges}</div>
+              </div>
+
+              <!-- Dynamic Index Target, Timeframe & Stop-Loss -->
+              <div class="bg-[#1e222d] border border-[#2a2e39] rounded p-2.5 text-xs space-y-1.5">
+                <div class="font-semibold text-white text-[11px] uppercase tracking-wider">Dynamic Index Outlook (${idx.candle_timeframe_label})</div>
+                <div class="flex justify-between">
+                  <span class="text-[#787b86]">Dynamic Target Level:</span>
+                  <span class="font-mono-num font-bold text-[#089981]">${formatNum(geom.target_price)} pts (+${geom.target_upside_pct}%)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#787b86]">Suggested Target Time:</span>
+                  <span class="font-mono-num font-bold text-[#f59e0b]">${geom.target_timeframe_label} (${geom.target_date})</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#787b86]">Support / Stop-Loss:</span>
+                  <span class="font-mono-num font-bold text-[#f23645]">${formatNum(geom.stop_loss_price)} pts (-${geom.stop_distance_pct}%)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-2 pt-2 border-t border-[#2a2e39]">
+              <button onclick="loadSingleIndexDeepDive('${idx.ticker}', true)" class="tv-btn-primary px-3 py-1.5 text-xs flex-1">
+                View 3Y Chart (${idx.candle_timeframe})
+              </button>
+              <button onclick="selectQuickTicker('${idx.ticker}'); switchTab('terminal'); runTerminalAnalysis();" class="tv-btn-secondary px-3 py-1.5 text-xs">
+                AI Deep Dive
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('indicesCardsContainer').innerHTML = cardsHtml;
+    }
+
+    function initIndexTradingViewChart() {
+      const container = document.getElementById('tvIndexChartContainer');
+      if (!container || !window.LightweightCharts) return;
+
+      tvIndexChart = LightweightCharts.createChart(container, {
+        width: container.clientWidth,
+        height: 400,
+        layout: {
+          background: { type: 'solid', color: '#131722' },
+          textColor: '#d1d4dc',
+        },
+        grid: {
+          vertLines: { color: '#1e222d' },
+          horzLines: { color: '#1e222d' },
+        },
+        rightPriceScale: {
+          borderColor: '#2a2e39',
+        },
+        timeScale: {
+          borderColor: '#2a2e39',
+        },
+      });
+
+      idxCandleSeries = tvIndexChart.addCandlestickSeries({
+        upColor: '#089981',
+        downColor: '#f23645',
+        borderUpColor: '#089981',
+        borderDownColor: '#f23645',
+        wickUpColor: '#089981',
+        wickDownColor: '#f23645',
+      });
+
+      idxSma50Series = tvIndexChart.addLineSeries({
+        color: '#2962ff',
+        lineWidth: 2,
+        title: '50-MA',
+      });
+
+      idxSma200Series = tvIndexChart.addLineSeries({
+        color: '#f59e0b',
+        lineWidth: 2,
+        title: '200-MA',
+      });
+
+      window.addEventListener('resize', () => {
+        if (tvIndexChart && container.clientWidth > 0) {
+          tvIndexChart.applyOptions({ width: container.clientWidth });
+        }
+      });
+    }
+
+    async function loadSingleIndexDeepDive(symbol, scrollIntoView = false) {
+      try {
+        const res = await fetch(`/api/indices/${encodeURIComponent(symbol)}?timeframe=${encodeURIComponent(activeIndexTimeframe)}&lookback_years=3`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to load index chart');
+
+        const geom = data.strategy_geometry || {};
+        const p3 = data.performance_3y || {};
+        document.getElementById('idxChartTitle').textContent =
+          `${data.ticker} (${data.full_name}) — 3-Year Chart [${data.candle_timeframe_label}]`;
+        document.getElementById('idxChartSubtitle').textContent =
+          `3Y Return: +${p3.return_3y_pct}% (CAGR: +${p3.cagr_3y_pct}%/yr) | Dynamic Target: ${formatNum(geom.target_price)} pts (+${geom.target_upside_pct}% in ${geom.target_timeframe_label}) | Stop-Loss: ${formatNum(geom.stop_loss_price)} pts`;
+
+        if (!tvIndexChart) initIndexTradingViewChart();
+        const cs = data.chart_series || {};
+        const candles = cs.candles || [];
+        if (idxCandleSeries && candles.length > 0) {
+          idxCandleSeries.setData(candles);
+          idxSma50Series.setData(cs.sma50 || []);
+          idxSma200Series.setData(cs.sma200 || []);
+
+          idxPriceLines.forEach(pl => idxCandleSeries.removePriceLine(pl));
+          idxPriceLines = [];
+
+          if (geom.entry_price) {
+            idxPriceLines.push(idxCandleSeries.createPriceLine({
+              price: geom.entry_price,
+              color: '#2962ff',
+              lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Solid,
+              axisLabelVisible: true,
+              title: 'Current',
+            }));
+          }
+          if (geom.target_price) {
+            idxPriceLines.push(idxCandleSeries.createPriceLine({
+              price: geom.target_price,
+              color: '#089981',
+              lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: `Target (${geom.target_timeframe_label})`,
+            }));
+          }
+          if (geom.stop_loss_price) {
+            idxPriceLines.push(idxCandleSeries.createPriceLine({
+              price: geom.stop_loss_price,
+              color: '#f23645',
+              lineWidth: 2,
+              lineStyle: LightweightCharts.LineStyle.Dashed,
+              axisLabelVisible: true,
+              title: 'Stop-Loss',
+            }));
+          }
+          tvIndexChart.timeScale().fitContent();
+        }
+
+        if (data.chart_image_url) {
+          const wrap = document.getElementById('idxStaticPngWrapper');
+          wrap.classList.remove('hidden');
+          document.getElementById('idxStaticChartImg').src = data.chart_image_url + '?t=' + Date.now();
+        }
+
+        if (scrollIntoView) {
+          document.getElementById('indexDeepDivePanel').scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // =========================================================================
+    // TAB 5: RECOMMENDATIONS LEDGER, ACCURACY STATS, LESSONS & THESES
+    // =========================================================================
+
+    function renderRecommendationsSection(stats, recs) {
+      document.getElementById('recStatTotal').textContent = stats.total_recommendations || 0;
+      document.getElementById('recStatBreakdown').textContent =
+        `${stats.active_count || 0} Active • ${stats.resolved_count || 0} Resolved`;
+      document.getElementById('recStatAccuracy').textContent =
+        `${stats.overall_accuracy_score_pct ?? 0}%`;
+      document.getElementById('recStatFavorableRate').textContent =
+        `Positive / Validated Rate: ${stats.positive_or_validated_rate_pct ?? 0}% (Avg Ret: ${(stats.average_return_pct || 0) >= 0 ? '+' : ''}${stats.average_return_pct || 0}%)`;
+      document.getElementById('recStatHits').textContent =
+        `${stats.target_hit_count || 0} Target Hits / ${stats.stop_loss_hit_count || 0} Stops`;
+      document.getElementById('recStatMfe').textContent =
+        `Avg Peak Excursion (MFE): +${stats.average_mfe_pct || 0}%`;
+
+      const srcContainer = document.getElementById('recStatSources');
+      const sources = stats.by_source || [];
+      if (sources.length === 0) {
+        srcContainer.innerHTML = `<div class="text-[#787b86]">No sources evaluated yet</div>`;
+      } else {
+        srcContainer.innerHTML = sources.slice(0, 3).map(s => `
+          <div class="flex items-center justify-between">
+            <span class="truncate max-w-[160px]" title="${s.source}">${s.source}</span>
+            <span class="font-mono-num font-bold text-[#089981]">${s.avg_accuracy_pct}% (${s.count})</span>
+          </div>
+        `).join('');
+      }
+
+      const tblContainer = document.getElementById('recommendationsTableContainer');
+      if (!recs || recs.length === 0) {
+        tblContainer.innerHTML = `
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-4 text-xs text-[#787b86]">
+            No recommendations saved yet. Run any stock or index analysis (or click "+ Log External Recommendation") to start tracking.
+          </div>
+        `;
+        return;
+      }
+
+      tblContainer.innerHTML = `
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#2a2e39] text-[#787b86]">
+              <th class="py-2 px-2.5">Date</th>
+              <th class="py-2 px-2.5">Stock / Index</th>
+              <th class="py-2 px-2.5">Candle</th>
+              <th class="py-2 px-2.5">Source</th>
+              <th class="py-2 px-2.5">Action</th>
+              <th class="py-2 px-2.5">Entry</th>
+              <th class="py-2 px-2.5">Dynamic Target</th>
+              <th class="py-2 px-2.5">Target Time / Date</th>
+              <th class="py-2 px-2.5">Stop-Loss</th>
+              <th class="py-2 px-2.5">Live Price &amp; Return</th>
+              <th class="py-2 px-2.5">Peak (MFE) / Trough</th>
+              <th class="py-2 px-2.5">Evaluation &amp; Accuracy</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#2a2e39]">
+            ${recs.map(r => {
+              const ret = Number(r.current_return_pct || 0);
+              const retSign = ret >= 0 ? '+' : '';
+              const retCol = ret >= 0 ? 'text-[#089981]' : 'text-[#f23645]';
+              let badgeCol = 'bg-[#2a2e39] text-[#d1d4dc]';
+              if (r.status === 'TARGET_HIT' || r.status === 'EXPIRED_PROFITABLE' || r.status === 'WAIT_VALIDATED') {
+                badgeCol = 'bg-[#089981]/20 text-[#089981] border border-[#089981]/40';
+              } else if (r.status === 'STOP_LOSS_HIT' || r.status === 'EXPIRED_MISSED') {
+                badgeCol = 'bg-[#f23645]/20 text-[#f23645] border border-[#f23645]/40';
+              } else if (r.status === 'ACTIVE') {
+                badgeCol = 'bg-[#2962ff]/20 text-[#2962ff] border border-[#2962ff]/40';
+              }
+
+              return `
+                <tr class="hover:bg-[#262b38]">
+                  <td class="py-2 px-2.5 font-mono-num text-[#787b86] whitespace-nowrap">${r.created_date}</td>
+                  <td class="py-2 px-2.5 font-mono-num font-bold text-white whitespace-nowrap">${r.ticker}</td>
+                  <td class="py-2 px-2.5 font-mono-num text-[#d1d4dc]">${r.candle_timeframe || '1D'}</td>
+                  <td class="py-2 px-2.5 text-[#d1d4dc] max-w-[150px] truncate" title="${r.source}">${r.source}</td>
+                  <td class="py-2 px-2.5 font-semibold text-white">${r.action}</td>
+                  <td class="py-2 px-2.5 font-mono-num">${formatNum(r.entry_price)}</td>
+                  <td class="py-2 px-2.5 font-mono-num text-[#089981]">${formatNum(r.target_price)} (+${r.target_upside_pct}%)</td>
+                  <td class="py-2 px-2.5 font-mono-num text-[#f59e0b]">
+                    <div>${r.target_timeframe_label}</div>
+                    <div class="text-[10px] text-[#787b86]">By ${r.target_date} (${r.days_elapsed}d elapsed)</div>
+                  </td>
+                  <td class="py-2 px-2.5 font-mono-num text-[#f23645]">${formatNum(r.stop_loss_price)} (-${r.stop_loss_pct}%)</td>
+                  <td class="py-2 px-2.5 font-mono-num">
+                    <div class="font-bold text-white">${formatNum(r.current_price)}</div>
+                    <div class="${retCol} font-semibold">${retSign}${ret.toFixed(2)}%</div>
+                  </td>
+                  <td class="py-2 px-2.5 font-mono-num text-[11px]">
+                    <div class="text-[#089981]">MFE: +${Number(r.max_favorable_excursion_pct || 0).toFixed(1)}%</div>
+                    <div class="text-[#f23645]">MAE: ${Number(r.max_adverse_excursion_pct || 0).toFixed(1)}%</div>
+                  </td>
+                  <td class="py-2 px-2.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCol}">${r.status}</span>
+                      <span class="font-mono-num font-bold text-white">${Number(r.accuracy_score || 0).toFixed(0)}%</span>
+                    </div>
+                    <div class="text-[10px] text-[#787b86] mt-0.5 max-w-[240px]" title="${r.evaluation_notes || ''}">${r.evaluation_notes || ''}</div>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderLessons(lessons) {
+      const container = document.getElementById('lessonsContainer');
+      if (!lessons || lessons.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-2 bg-[#131722] border border-[#2a2e39] rounded p-4 text-xs text-[#787b86]">
+            No lessons recorded yet. Once you close trades or click "Run Reflection &amp; Lesson Check", the AI summarizes what worked and what to avoid.
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = lessons.map(l => `
+        <div class="bg-[#131722] border border-[#2a2e39] rounded p-3 space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-[#2962ff]">${l.category || 'Trading Rule'} • ${l.ticker || 'ALL'}</span>
+            <span class="text-[11px] font-mono-num text-[#787b86]">Confidence: ${Math.round((l.confidence_weight || 0.85) * 100)}%</span>
+          </div>
+          <div class="text-xs font-semibold text-white">${l.rule_statement || l.rule_title || ''}</div>
+          <p class="text-xs text-[#787b86]">${l.evidence_summary || l.lesson_text || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    function renderThesesHistory(theses) {
+      const container = document.getElementById('thesesTableContainer');
+      if (!theses || theses.length === 0) {
+        container.innerHTML = `
+          <div class="bg-[#131722] border border-[#2a2e39] rounded p-4 text-xs text-[#787b86]">
+            No stock analyses or trades saved yet.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="border-b border-[#2a2e39] text-[#787b86]">
+              <th class="py-2 px-3">Date</th>
+              <th class="py-2 px-3">Stock / Index</th>
+              <th class="py-2 px-3">Candle</th>
+              <th class="py-2 px-3">Status</th>
+              <th class="py-2 px-3">Entry Price</th>
+              <th class="py-2 px-3">Dynamic Target</th>
+              <th class="py-2 px-3">Target Horizon</th>
+              <th class="py-2 px-3">Stop-Loss</th>
+              <th class="py-2 px-3">Result</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#2a2e39]">
+            ${theses.map(t => {
+              const stopVal = t.initial_stop_loss ?? t.stop_loss ?? '—';
+              const retVal = t.realized_return_pct ?? t.actual_return_pct;
+              return `
+                <tr class="hover:bg-[#262b38]">
+                  <td class="py-2 px-3 font-mono-num text-[#787b86]">${(t.entry_date || '').slice(0, 10)}</td>
+                  <td class="py-2 px-3 font-mono-num font-bold text-white">${t.ticker}</td>
+                  <td class="py-2 px-3 font-mono-num text-[#d1d4dc]">${t.candle_timeframe || '1D'}</td>
+                  <td class="py-2 px-3">
+                    <span class="px-2 py-0.5 rounded bg-[#2a2e39] text-[#d1d4dc] text-[11px]">${t.status}</span>
+                  </td>
+                  <td class="py-2 px-3 font-mono-num">${formatNum(t.entry_price)}</td>
+                  <td class="py-2 px-3 font-mono-num text-[#089981]">${formatNum(t.target_price)}</td>
+                  <td class="py-2 px-3 font-mono-num text-[#f59e0b]">${t.target_timeframe_label || t.time_horizon_deadline || '—'}</td>
+                  <td class="py-2 px-3 font-mono-num text-[#f23645]">${formatNum(stopVal)}</td>
+                  <td class="py-2 px-3 font-mono-num">${retVal !== null && retVal !== undefined && Number(retVal) !== 0 ? (Number(retVal) >= 0 ? '+' : '') + Number(retVal).toFixed(2) + '%' : (t.actual_outcome || '—')}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function selectQuickTicker(ticker) {
+      activeTicker = ticker;
+      document.getElementById('terminalTickerInput').value = ticker;
+      document.getElementById('quickTickerInput').value = ticker;
+    }
+
+    function sendPresetQuestion(questionText) {
+      document.getElementById('terminalCustomPrompt').value = questionText;
+      switchTab('terminal');
+      runTerminalAnalysis(questionText);
+    }
+
+    function quickAnalyzeFromHeader() {
+      const ticker = document.getElementById('quickTickerInput').value.trim().toUpperCase() || 'COMI.CA';
+      const tf = document.getElementById('headerTimeframeSelect').value || '1D';
+      syncGlobalTimeframe(tf);
+      document.getElementById('terminalTickerInput').value = ticker;
+      switchTab('terminal');
+      runTerminalAnalysis(`Analyze ${ticker} on ${tf} candles and give me the dynamic Target Price, Suggested Target Timeframe/Date, and Stop-Loss.`);
+    }
+
+    function appendChatMessage(role, title, htmlBody) {
+      const container = document.getElementById('chatMessagesContainer');
+      const isUser = role === 'user';
+      const wrapper = document.createElement('div');
+      wrapper.className = isUser
+        ? 'bg-[#262b38] border border-[#2962ff] rounded p-3 text-xs'
+        : 'bg-[#131722] border border-[#2a2e39] rounded p-3 text-xs';
+      wrapper.innerHTML = `
+        <div class="flex items-center justify-between mb-1">
+          <span class="font-bold ${isUser ? 'text-[#2962ff]' : 'text-[#089981]'}">${title}</span>
+          <span class="text-[10px] text-[#787b86]">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="text-[#d1d4dc] leading-relaxed space-y-1">${htmlBody}</div>
+      `;
+      container.prepend(wrapper);
+    }
+
+    function clearChatLog() {
+      document.getElementById('chatMessagesContainer').innerHTML = '';
+    }
+
+    async function runTerminalAnalysis(overrideQuestion) {
+      const ticker = (document.getElementById('terminalTickerInput').value || 'COMI.CA').trim().toUpperCase();
+      const tf = document.getElementById('terminalTimeframeSelect').value || activeTimeframe || '1D';
+      activeTicker = ticker;
+      syncGlobalTimeframe(tf);
+
+      const customPrompt = overrideQuestion || document.getElementById('terminalCustomPrompt').value.trim() ||
+        `Analyze ${ticker} on ${tf} candles and suggest the dynamic Target Price, Target Timeframe, and Stop-Loss.`;
+
+      const btn = document.getElementById('btnTerminalAnalyze');
+      const headerBtn = document.getElementById('headerAnalyzeBtn');
+      btn.disabled = true;
+      btn.textContent = 'Analyzing...';
+      headerBtn.disabled = true;
+
+      appendChatMessage('user', `You (${ticker} • ${tf})`, customPrompt);
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticker: ticker,
+            query: customPrompt,
+            auto_save_thesis: true,
+            timeframe: tf
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Analysis failed');
+        }
+
+        const geom = data.technical?.strategy_geometry || {};
+        latestAnalyzedThesis = {
+          ...(data.saved_thesis || {}),
+          ticker: data.ticker,
+          asset_type: data.asset_type,
+          candle_timeframe: data.candle_timeframe || tf,
+          candle_timeframe_label: data.candle_timeframe_label || tf,
+          entry_price: geom.entry_price,
+          target_price: geom.target_price,
+          target_upside_pct: geom.target_upside_pct,
+          target_days: geom.target_days,
+          target_timeframe_label: geom.target_timeframe_label,
+          target_date: geom.target_date,
+          stop_loss: geom.stop_loss_price,
+          stop_distance_pct: geom.stop_distance_pct,
+          reward_to_risk: geom.reward_to_risk,
+          recommended_shares: geom.recommended_shares,
+          recommended_allocation_egp: geom.recommended_position_egp,
+          max_allocation_pct: geom.recommended_allocation_pct
+        };
+
+        updateProposalCard(data, latestAnalyzedThesis);
+        updateSimpleChartTab(data, latestAnalyzedThesis);
+
+        const synth = data.synthesis || {};
+        const rec = synth.action_recommendation || 'Analysis Complete';
+        const unit = data.asset_type === 'INDEX' ? 'pts' : 'EGP';
+        const summaryHtml = `
+          <div class="font-semibold text-white mb-1">${synth.thesis_summary || ''}</div>
+          <ul class="space-y-1">
+            <li>• <strong>Candle Timeframe:</strong> ${data.candle_timeframe_label || tf}</li>
+            <li>• <strong>Entry Level:</strong> ${formatNum(geom.entry_price)} ${unit}</li>
+            <li>• <strong>Dynamic Target:</strong> <span class="text-[#089981] font-semibold">${formatNum(geom.target_price)} ${unit} (+${geom.target_upside_pct}%)</span></li>
+            <li>• <strong>Suggested Target Timeframe:</strong> <span class="text-[#f59e0b] font-semibold">${geom.target_timeframe_label} (by ${geom.target_date})</span></li>
+            <li>• <strong>Dynamic Stop-Loss:</strong> <span class="text-[#f23645] font-semibold">${formatNum(geom.stop_loss_price)} ${unit} (-${geom.stop_distance_pct}%)</span> • R:R ${geom.reward_to_risk}:1</li>
+          </ul>
+        `;
+        appendChatMessage(
+          'agent',
+          `AI Advisor — ${data.ticker} [${tf}]: ${rec}`,
+          summaryHtml
+        );
+
+        await fetchSystemState();
+      } catch (err) {
+        appendChatMessage('agent', 'Error', `<span class="text-[#f23645]">${err.message}</span>`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run Analysis';
+        headerBtn.disabled = false;
+      }
+    }
+
+    function updateProposalCard(data, thesis) {
+      const synth = data.synthesis || {};
+      const rec = synth.action_recommendation || 'REVIEW';
+      const unit = data.asset_type === 'INDEX' ? 'pts' : 'EGP';
+
+      document.getElementById('proposalSubHeader').textContent =
+        `Dynamic Action Plan • ${thesis.candle_timeframe_label} Candles • Source: ${data.ai_provider_used || 'Hybrid Engine'}`;
+      document.getElementById('proposalTitle').textContent = `${data.ticker} (${data.company_name || ''}) — ${rec}`;
+
+      const badge = document.getElementById('proposalBadge');
+      badge.textContent = rec;
+      if (rec.includes('BUY') || rec.includes('ACCUMULATE')) {
+        badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-[#089981] text-white';
+      } else if (rec.includes('WAIT')) {
+        badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-[#f59e0b] text-black';
+      } else {
+        badge.className = 'px-2.5 py-1 rounded text-xs font-bold bg-[#f23645] text-white';
+      }
+
+      document.getElementById('propEntryPrice').textContent = `${formatNum(thesis.entry_price)} ${unit}`;
+      document.getElementById('propCandleLabel').textContent = `${thesis.candle_timeframe_label}`;
+      document.getElementById('propTargetPrice').textContent = `${formatNum(thesis.target_price)} ${unit}`;
+      document.getElementById('propTargetUpside').textContent = `+${thesis.target_upside_pct}% (R:R ${thesis.reward_to_risk}:1)`;
+      document.getElementById('propTargetTime').textContent = thesis.target_timeframe_label || '—';
+      document.getElementById('propTargetDate').textContent = `By ${thesis.target_date || '—'}`;
+      document.getElementById('propStopLoss').textContent = `${formatNum(thesis.stop_loss)} ${unit}`;
+      document.getElementById('propStopPct').textContent = `-${thesis.stop_distance_pct}% risk`;
+
+      if (data.asset_type === 'INDEX') {
+        document.getElementById('propShares').textContent = 'Market Index';
+        document.getElementById('propAllocationEgp').textContent = '3Y Benchmark';
+      } else {
+        document.getElementById('propShares').textContent = `${thesis.recommended_shares || 0} shares`;
+        document.getElementById('propAllocationEgp').textContent =
+          `${formatEGP(thesis.recommended_allocation_egp || 0)} (${thesis.max_allocation_pct || 0}%)`;
+      }
+
+      const detailsBox = document.getElementById('proposalDetailsBox');
+      detailsBox.classList.remove('hidden');
+      document.getElementById('propWhyGood').textContent =
+        (synth.technical_triggers || []).slice(0, 2).join(' | ') || synth.thesis_summary || '';
+      document.getElementById('propWhenExit').textContent =
+        (synth.invalidation_rules || []).slice(0, 2).join(' | ') || `Exit if price closes below ${thesis.stop_loss} ${unit}.`;
+
+      const execBtn = document.getElementById('btnExecuteThesis');
+      execBtn.disabled = !thesis.thesis_id || data.asset_type === 'INDEX';
+    }
+
+    // =========================================================================
+    // TAB 4: INTERACTIVE STOCK/INDEX CHART (WITH 1D / 1W / 1M SWITCHER)
+    // =========================================================================
+
+    function initTradingViewChart() {
+      const container = document.getElementById('tvChartContainer');
+      if (!container || !window.LightweightCharts) return;
+
+      tvChart = LightweightCharts.createChart(container, {
+        width: container.clientWidth,
+        height: 440,
+        layout: {
+          background: { type: 'solid', color: '#131722' },
+          textColor: '#d1d4dc',
+        },
+        grid: {
+          vertLines: { color: '#1e222d' },
+          horzLines: { color: '#1e222d' },
+        },
+        rightPriceScale: {
+          borderColor: '#2a2e39',
+        },
+        timeScale: {
+          borderColor: '#2a2e39',
+        },
+      });
+
+      candleSeries = tvChart.addCandlestickSeries({
+        upColor: '#089981',
+        downColor: '#f23645',
+        borderUpColor: '#089981',
+        borderDownColor: '#f23645',
+        wickUpColor: '#089981',
+        wickDownColor: '#f23645',
+      });
+
+      sma50Series = tvChart.addLineSeries({
+        color: '#2962ff',
+        lineWidth: 2,
+        title: '50-MA',
+      });
+
+      sma200Series = tvChart.addLineSeries({
+        color: '#f59e0b',
+        lineWidth: 2,
+        title: '200-MA',
+      });
+
+      window.addEventListener('resize', () => {
+        if (tvChart && container.clientWidth > 0) {
+          tvChart.applyOptions({ width: container.clientWidth });
+        }
+      });
+    }
+
+    async function switchChartTimeframe(tf) {
+      syncGlobalTimeframe(tf);
+      const tkr = activeTicker || document.getElementById('quickTickerInput').value.trim().toUpperCase() || 'COMI.CA';
+      try {
+        const res = await fetch(`/api/technical/${encodeURIComponent(tkr)}?timeframe=${encodeURIComponent(tf)}`);
+        const tech = await res.json();
+        if (!res.ok) throw new Error(tech.detail || 'Failed to switch candle timeframe');
+
+        const geom = tech.strategy_geometry || {};
+        const pseudoData = {
+          ticker: tech.ticker,
+          company_name: tech.company_name,
+          asset_type: tech.asset_type,
+          candle_timeframe: tech.candle_timeframe,
+          candle_timeframe_label: tech.candle_timeframe_label,
+          chart_image_url: tech.chart_image_url,
+          technical: tech,
+          synthesis: {
+            action_recommendation: tech.scoring?.regime_verdict || 'Analyzed'
+          }
+        };
+        const pseudoThesis = {
+          entry_price: geom.entry_price,
+          target_price: geom.target_price,
+          target_upside_pct: geom.target_upside_pct,
+          target_timeframe_label: geom.target_timeframe_label,
+          target_date: geom.target_date,
+          stop_loss: geom.stop_loss_price,
+          stop_distance_pct: geom.stop_distance_pct
+        };
+        updateSimpleChartTab(pseudoData, pseudoThesis);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateSimpleChartTab(data, thesis) {
+      const tech = data.technical || {};
+      const ind = tech.indicators || {};
+      const geom = tech.strategy_geometry || {};
+      const synth = data.synthesis || {};
+      const curPrice = tech.price?.current || thesis.entry_price || 0;
+      const unit = data.asset_type === 'INDEX' ? 'pts' : 'EGP';
+      const tfLabel = data.candle_timeframe_label || geom.candle_timeframe_label || 'Daily (1D)';
+
+      document.getElementById('chartStockTitle').textContent =
+        `${data.ticker} (${data.company_name || data.ticker}) — ${tfLabel} Chart & Dynamic Levels`;
+      document.getElementById('chartRecommendationPill').textContent =
+        `${tfLabel} • ${synth.action_recommendation || 'Analyzed'}`;
+
+      const isUp = curPrice >= (ind.sma50 || 0);
+      const trendEl = document.getElementById('simpleTrendStatus');
+      trendEl.textContent = isUp ? `UPTREND (${tfLabel})` : `PULLBACK / BELOW 50-MA (${tfLabel})`;
+      trendEl.className = 'text-sm font-bold mt-1 ' + (isUp ? 'text-[#089981]' : 'text-[#f59e0b]');
+      document.getElementById('simpleTrendExplain').textContent =
+        `Current: ${formatNum(curPrice)} | 50-MA: ${formatNum(ind.sma50)} | 200-MA: ${formatNum(ind.sma200)}`;
+
+      const rsi = ind.rsi_14_daily || 50;
+      const rsiEl = document.getElementById('simpleRsiStatus');
+      if (rsi < 36) {
+        rsiEl.textContent = `${rsi} — OVERSOLD (Value Zone)`;
+        rsiEl.className = 'text-sm font-bold mt-1 text-[#089981]';
+      } else if (rsi > 72) {
+        rsiEl.textContent = `${rsi} — OVERBOUGHT (Wait for dip)`;
+        rsiEl.className = 'text-sm font-bold mt-1 text-[#f23645]';
+      } else {
+        rsiEl.textContent = `${rsi} — CONSTRUCTIVE ENERGY`;
+        rsiEl.className = 'text-sm font-bold mt-1 text-white';
+      }
+
+      document.getElementById('simpleTargetStatus').textContent =
+        `${formatNum(thesis.target_price)} ${unit} (+${geom.target_upside_pct || thesis.target_upside_pct || 0}%)`;
+      document.getElementById('simpleTargetExplain').textContent =
+        `Suggested Timeframe: ${geom.target_timeframe_label || thesis.target_timeframe_label || '—'} (by ${geom.target_date || thesis.target_date || '—'})`;
+
+      document.getElementById('simpleStopStatus').textContent =
+        `${formatNum(thesis.stop_loss)} ${unit} (-${geom.stop_distance_pct || thesis.stop_distance_pct || 0}%)`;
+      document.getElementById('simpleStopExplain').textContent =
+        `Reward-to-Risk Ratio: ${geom.reward_to_risk || '—'}:1`;
+
+      if (data.chart_image_url) {
+        document.getElementById('staticChartImg').src = data.chart_image_url + '?t=' + Date.now();
+        document.getElementById('pngPathLabel').textContent = data.chart_image_url;
+      }
+
+      // Fix Bug #1: Use `tech.chart_series.candles`, `sma50`, and `sma200`
+      if (!tvChart) initTradingViewChart();
+      const cs = tech.chart_series || {};
+      const candles = cs.candles || [];
+      if (candleSeries && candles.length > 0) {
+        candleSeries.setData(candles);
+        sma50Series.setData(cs.sma50 || []);
+        sma200Series.setData(cs.sma200 || []);
+
+        priceLines.forEach(pl => candleSeries.removePriceLine(pl));
+        priceLines = [];
+
+        if (thesis.entry_price) {
+          priceLines.push(candleSeries.createPriceLine({
+            price: thesis.entry_price,
+            color: '#2962ff',
+            lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Solid,
+            axisLabelVisible: true,
+            title: 'Entry',
+          }));
+        }
+        if (thesis.target_price) {
+          priceLines.push(candleSeries.createPriceLine({
+            price: thesis.target_price,
+            color: '#089981',
+            lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Dashed,
+            axisLabelVisible: true,
+            title: `Target (+${geom.target_upside_pct || ''}%)`,
+          }));
+        }
+        if (thesis.stop_loss) {
+          priceLines.push(candleSeries.createPriceLine({
+            price: thesis.stop_loss,
+            color: '#f23645',
+            lineWidth: 2,
+            lineStyle: LightweightCharts.LineStyle.Dashed,
+            axisLabelVisible: true,
+            title: 'Stop-Loss',
+          }));
+        }
+
+        tvChart.timeScale().fitContent();
+      }
+    }
+
+    function toggleStaticPngChart() {
+      const el = document.getElementById('staticPngContainer');
+      el.classList.toggle('hidden');
+    }
+
+    async function executeCurrentProposedThesis() {
+      if (!latestAnalyzedThesis || !latestAnalyzedThesis.thesis_id) return;
+      const defaultAlloc = latestAnalyzedThesis.recommended_allocation_egp || 50000;
+      const allocInput = prompt(
+        `How much money (EGP) do you want to invest in ${latestAnalyzedThesis.ticker} at ${latestAnalyzedThesis.entry_price} EGP/share? (Max 20% of portfolio)`,
+        defaultAlloc
+      );
+      if (!allocInput || Number(allocInput) <= 0) return;
+
+      try {
+        const res = await fetch('/api/positions/open', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            thesis_id: latestAnalyzedThesis.thesis_id,
+            allocation_egp: Number(allocInput),
+            custom_entry_price: Number(latestAnalyzedThesis.entry_price)
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Could not execute trade');
+        await fetchSystemState();
+        switchTab('portfolio');
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // =========================================================================
+    // MODALS: DIRECT TRADE, MANUAL RECOMMENDATION, EVALUATION, & SETTINGS
+    // =========================================================================
+
+    function openDirectTradeModal(defaultAction = 'BUY') {
+      document.getElementById('dtAction').value = defaultAction;
+      const modal = document.getElementById('directTradeModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDirectTradeModal() {
+      const modal = document.getElementById('directTradeModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function submitDirectTrade() {
+      const side = document.getElementById('dtAction').value;
+      const ticker = document.getElementById('dtTicker').value.trim().toUpperCase();
+      const company_name = document.getElementById('dtCompanyName').value.trim();
+      const shares = Number(document.getElementById('dtShares').value);
+      const price = Number(document.getElementById('dtPrice').value);
+      const fees_egp = Number(document.getElementById('dtExtraFees').value || 0);
+      const notes = document.getElementById('dtNotes').value.trim();
+
+      if (!ticker || shares <= 0 || price <= 0) {
+        alert('Please enter a valid ticker, number of shares, and price.');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitDirectTrade');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/api/trades/direct', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticker,
+            side,
+            shares,
+            price,
+            fees_egp,
+            company_name: company_name || null,
+            notes: notes || 'Logged from Quick Trade form'
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to save trade');
+
+        closeDirectTradeModal();
+        await fetchSystemState();
+        switchTab('portfolio');
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Trade to DB';
+      }
+    }
+
+    function openManualRecModal() {
+      document.getElementById('mrDate').value = new Date().toISOString().slice(0, 10);
+      const modal = document.getElementById('manualRecModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeManualRecModal() {
+      const modal = document.getElementById('manualRecModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function submitManualRecommendation() {
+      const ticker = document.getElementById('mrTicker').value.trim().toUpperCase();
+      const source = document.getElementById('mrSource').value.trim() || 'Manual Entry';
+      const action = document.getElementById('mrAction').value;
+      const candle_timeframe = document.getElementById('mrTimeframe').value;
+      const created_date = document.getElementById('mrDate').value;
+      const entry_price = Number(document.getElementById('mrEntry').value);
+      const target_price = Number(document.getElementById('mrTarget').value);
+      const stop_loss_price = Number(document.getElementById('mrStop').value);
+      const target_days = Number(document.getElementById('mrTargetDays').value || 45);
+      const conviction_score = Number(document.getElementById('mrConviction').value || 80);
+      const rationale_summary = document.getElementById('mrRationale').value.trim();
+
+      if (!ticker || entry_price <= 0 || target_price <= 0 || stop_loss_price <= 0) {
+        alert('Please enter valid ticker, entry, target, and stop-loss prices.');
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitManualRec');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/api/recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticker,
+            source,
+            action,
+            candle_timeframe,
+            created_date: created_date || null,
+            entry_price,
+            target_price,
+            stop_loss_price,
+            target_days,
+            conviction_score,
+            rationale_summary
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to save recommendation');
+        closeManualRecModal();
+        await fetchSystemState();
+        switchTab('memory');
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save & Evaluate';
+      }
+    }
+
+    async function evaluateAllRecommendationsUI() {
+      const btn = document.getElementById('btnEvaluateRecs');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Evaluating...';
+      }
+      try {
+        await fetch('/api/recommendations/evaluate', { method: 'POST' });
+        await fetchSystemState();
+        switchTab('memory');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '↻ Evaluate Recs';
+        }
+      }
+    }
+
+    async function promptUpdatePositionPrice(positionId, ticker, currentPrice) {
+      await fetch(`/api/technical/${encodeURIComponent(ticker)}`);
+      await fetchSystemState();
+    }
+
+    async function trimHalfPosition(positionId, currentPrice) {
+      await fetch(`/api/positions/${encodeURIComponent(positionId)}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'PARTIAL_TRIM_50',
+          execution_price: Number(currentPrice),
+          notes: '50% Partial trim.'
+        })
+      });
+      await fetchSystemState();
+    }
+
+    async function closeFullPosition(positionId, ticker, currentPrice) {
+      const exitPrice = prompt(`Enter exit price (EGP) to close ${ticker}:`, currentPrice);
+      if (!exitPrice || isNaN(Number(exitPrice)) || Number(exitPrice) <= 0) return;
+
+      await fetch(`/api/positions/${encodeURIComponent(positionId)}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'FULL_EXIT',
+          execution_price: Number(exitPrice),
+          notes: 'Closed from portfolio dashboard.'
+        })
+      });
+      await fetchSystemState();
+    }
+
+    function openSettingsModal() {
+      const s = currentState?.portfolio?.settings || {};
+      const summary = currentState?.portfolio?.summary || {};
+
+      document.getElementById('setCashBalance').value = s.cash_balance_egp ?? summary.cash_balance_egp ?? 1000000;
+      document.getElementById('setInitialCapital').value = s.initial_capital_egp ?? summary.initial_capital_egp ?? 1000000;
+      document.getElementById('setMaxAllocPct').value = Math.round((s.max_allocation_pct ?? 0.20) * 100);
+      document.getElementById('setAtrMultiplier').value = s.atr_multiplier ?? 2.2;
+      document.getElementById('setAiMode').value = s.ai_mode || 'HYBRID_PRO_SUBSCRIPTION';
+      document.getElementById('setPreferredModel').value = s.preferred_model || 'gemini-2.5-pro';
+      document.getElementById('setGeminiApiKey').value = s.gemini_api_key || '';
+
+      const modal = document.getElementById('settingsModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeSettingsModal() {
+      const modal = document.getElementById('settingsModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveSettingsModal() {
+      const cash_balance_egp = Number(document.getElementById('setCashBalance').value);
+      const initial_capital_egp = Number(document.getElementById('setInitialCapital').value);
+      const maxAllocInput = Number(document.getElementById('setMaxAllocPct').value || 20);
+      const max_allocation_pct = maxAllocInput > 1 ? maxAllocInput / 100.0 : maxAllocInput;
+      const atr_multiplier = Number(document.getElementById('setAtrMultiplier').value || 2.2);
+      const ai_mode = document.getElementById('setAiMode').value;
+      const preferred_model = document.getElementById('setPreferredModel').value;
+      const gemini_api_key = document.getElementById('setGeminiApiKey').value.trim();
+
+      const btn = document.getElementById('btnSaveSettings');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cash_balance_egp,
+            initial_capital_egp,
+            max_allocation_pct,
+            atr_multiplier,
+            ai_mode,
+            preferred_model,
+            gemini_api_key
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to save settings');
+        closeSettingsModal();
+        await fetchSystemState();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Settings';
+      }
+    }
+
+    async function promptUpdateCash() {
+      openSettingsModal();
+    }
+
+    async function runSelfReflectionLoop() {
+      const btn = document.getElementById('btnReflection');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Checking...';
+      }
+      try {
+        await fetch('/api/reflection/run', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trigger_type: 'MANUAL_PORTFOLIO_AUDIT' })
+        });
+        await fetchSystemState();
+        switchTab('memory');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Run Reflection & Lesson Check';
+        }
+      }
+    }
+
+    async function confirmResetAllData() {
+      if (!confirm('Reset all trades, recommendations, and history and start fresh with 1,000,000 EGP cash?')) return;
+      await fetch('/api/reset', {
+        method: 'POST'
+      });
+      closeSettingsModal();
+      await fetchSystemState();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initTradingViewChart();
+      fetchSystemState();
+      setInterval(fetchSystemState, 60000);
+    });
+  </script>
+</body>
+</html>

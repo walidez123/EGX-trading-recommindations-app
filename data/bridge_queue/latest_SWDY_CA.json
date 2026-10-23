@@ -1,0 +1,120 @@
+{
+  "ticker": "SWDY.CA",
+  "generated_at": "2026-10-20T08:23:54.194819",
+  "chart_image_path": "C:\\Users\\waled\\OneDrive\\Desktop\\EGX project A\\static\\charts\\SWDY_CA_swing_chart.png",
+  "chart_image_url": "/static/charts/SWDY_CA_swing_chart.png",
+  "technical_metrics": {
+    "ticker": "SWDY.CA",
+    "company_name": "Elsewedy Electric",
+    "sector": "Industrials & Cables",
+    "data_source": "TradingView EGX Live + Yahoo History (EGX:SWDY)",
+    "as_of_date": "2026-10-19",
+    "price": {
+      "current": 109.2,
+      "daily_change_pct": 3.46,
+      "open": 105.55,
+      "high": 109.9,
+      "low": 101.5,
+      "volume": 659375,
+      "rvol": 1.18
+    },
+    "indicators": {
+      "sma20": 115.14,
+      "sma50": 119.9,
+      "sma200": 92.79,
+      "ema21": 115.08,
+      "dist_from_sma50_pct": -8.92,
+      "dist_from_sma200_pct": 17.69,
+      "rsi_14_daily": 41.23,
+      "rsi_14_weekly": 54.95,
+      "macd_line": -2.907,
+      "macd_signal": -2.057,
+      "macd_histogram": -0.85,
+      "bb_upper": 127.33,
+      "bb_middle": 115.14,
+      "bb_lower": 102.96,
+      "bb_pct_b": 0.26,
+      "bb_width_pct": 21.17,
+      "atr_14": 6.03,
+      "atr_pct": 5.52,
+      "vpoc_6m": 126.32
+    },
+    "fibonacci_6m": {
+      "swing_high": 139.6999969482422,
+      "swing_high_date": "2026-09-08",
+      "swing_low": 80.25,
+      "swing_low_date": "2026-04-21",
+      "fib_0_0_high": 139.7,
+      "fib_23_6": 125.67,
+      "fib_38_2": 116.99,
+      "fib_50_0": 109.97,
+      "fib_61_8_golden": 102.96,
+      "fib_78_6": 92.97,
+      "fib_100_0_low": 80.25,
+      "fib_ext_127_2": 155.87,
+      "fib_ext_161_8": 176.44
+    },
+    "pivots": {
+      "support_1": 101.5,
+      "support_2": 91.8,
+      "resistance_1": 129.0,
+      "resistance_2": 139.7,
+      "vpoc_price": 126.32
+    },
+    "strategy_geometry": {
+      "entry_price": 109.2,
+      "target_price_30pct": 141.96,
+      "take_profit_pct": 30.0,
+      "partial_trim_rule": "Trim 50% at +30.0% TP (141.96 EGP), trail remaining 50% with 2.5x ATR(14) stop to 6m deadline",
+      "initial_stop_loss_2_5x_atr": 94.12,
+      "stop_distance_egp": 15.08,
+      "stop_distance_pct": 13.81,
+      "reward_egp": 32.76,
+      "reward_to_risk": 2.17,
+      "min_horizon_date": "2027-01-18",
+      "max_deadline_date": "2027-04-18",
+      "recommended_shares": 16,
+      "recommended_position_egp": 1747.2,
+      "recommended_allocation_pct": 17.47,
+      "max_allocation_cap_pct": 20.0
+    },
+    "scoring": {
+      "technical_score": 64,
+      "regime_verdict": "CONSTRUCTIVE ACCUMULATION",
+      "deterministic_signals": [
+        "MACD Bearish Momentum Waning / Early Inflection (-0.850)",
+        "Healthy Participation Volume: 1.18x 20-day average"
+      ]
+    }
+  },
+  "tier_a_lessons_injected": [],
+  "tier_c_disclosures": [],
+  "synthesis": {
+    "fundamental_health_score": 89,
+    "fundamental_verdict": "STRONG FUNDAMENTAL TAILWIND",
+    "technical_status_verdict": "CONSTRUCTIVE ACCUMULATION",
+    "vision_chart_findings": "Chart shows price at 109.20 EGP with +30% profit goal at 141.96 EGP and safety stop-loss at 94.12 EGP.",
+    "strategy_alignment_score": 75,
+    "action_recommendation": "GOOD TO BUY (Strong 6-Month Setup)",
+    "conviction_score": 75,
+    "recommended_allocation_pct": 17.47,
+    "thesis_summary": "SWDY.CA (Elsewedy Electric): GOOD TO BUY (Strong 6-Month Setup). Buy near 109.20 EGP, Profit Goal (+30%): 141.96 EGP, Safety Stop-Loss: 94.12 EGP (Suggested size: 16 shares = 1,747 EGP).",
+    "fundamental_catalysts": [
+      "Strong USD/Export Income: Company earns foreign currency in Industrials & Cables, protecting profits against inflation.",
+      "Good Value Price: Stock trades at a reasonable price compared to its yearly earnings.",
+      "Steady Cash Flow: Strong business cash flow that attracts big buyers on the EGX."
+    ],
+    "technical_triggers": [
+      "Long-Term Uptrend Intact: Price (109.20 EGP) is holding safely above its 200-day average (92.79 EGP).",
+      "Healthy Buyer Demand: Momentum is balanced (41.23), giving room to climb toward +30%.",
+      "Strong Support Floor around 126.32 EGP (where most trading volume happened over the last 6 months)."
+    ],
+    "invalidation_rules": [
+      "Safety Stop-Loss: Sell if the daily price closes below 94.12 EGP (limits your maximum loss to -13.8%).",
+      "+30% Profit Goal: Sell 50% of your shares as soon as the price reaches 141.96 EGP (+30% gain) to lock in profit.",
+      "6-Month Time Limit: Close the trade by 2027-04-18 (180 days max hold) even if +30% hasn't been reached yet."
+    ],
+    "applied_lesson_ids": [],
+    "narrative_markdown": "### Simple 6-Month Swing Plan: **SWDY.CA** (Elsewedy Electric)\n**Recommendation:** `GOOD TO BUY (Strong 6-Month Setup)` | **Confidence Score:** `75/100`\n\n#### 1. Your Numbers (What to Do)\n- **Buy Price:** `109.20 EGP`\n- **+30% Profit Goal (Sell Half Here):** `141.96 EGP`\n- **Safety Stop-Loss (Exit if it Drops Here):** `94.12 EGP` *(Risk: `-13.8%`)*\n- **How Much to Buy (Safe 20% Limit):** `16 shares` (`1,747 EGP` = `17.5%` of your money)\n- **6-Month Time Limit:** `2027-04-18` *(180 days max)*\n\n#### 2. Why This Setup Makes Sense\n- Long-Term Uptrend Intact: Price (109.20 EGP) is holding safely above its 200-day average (92.79 EGP).\n- Healthy Buyer Demand: Momentum is balanced (41.23), giving room to climb toward +30%.\n- Strong Support Floor around 126.32 EGP (where most trading volume happened over the last 6 months).\n- Strong USD/Export Income: Company earns foreign currency in Industrials & Cables, protecting profits against inflation.\n- Good Value Price: Stock trades at a reasonable price compared to its yearly earnings.\n- Steady Cash Flow: Strong business cash flow that attracts big buyers on the EGX.\n\n#### 3. Your Safety & Exit Rules\n- Safety Stop-Loss: Sell if the daily price closes below 94.12 EGP (limits your maximum loss to -13.8%).\n- +30% Profit Goal: Sell 50% of your shares as soon as the price reaches 141.96 EGP (+30% gain) to lock in profit.\n- 6-Month Time Limit: Close the trade by 2027-04-18 (180 days max hold) even if +30% hasn't been reached yet.\n\n#### 4. Lessons Applied from Your Past Trades\n- No past trade lessons recorded yet.\n"
+  }
+}
